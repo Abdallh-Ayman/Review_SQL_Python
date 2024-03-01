@@ -528,11 +528,10 @@ Write a query to output the names of those students whose best friends got offer
 
 | hacker_id | name |
 | --- | --- |
-| 5077 | Rose |
-| 21283 | Angela |
-| 62743 | Frank |
-| 88255 | Patrick |
-| 96196 | Lisa |
+| 1 | Ashley |
+| 2 | Samantha |
+| 3 | Julia |
+| 4 | Scarlet |
 </div>
 output>>    
 Samantha  
