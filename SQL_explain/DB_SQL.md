@@ -362,7 +362,7 @@ ORDER BY quantity * unit_price DESC
  ```   
  **You need to include ALL the columns that aren't in aggregate functions in your GROUP BY:**
  ```SQL
- select coun , count(country) as Count 
+ select country , count(country) as Count 
  from Author
  group by country
  having count (country) > 4
