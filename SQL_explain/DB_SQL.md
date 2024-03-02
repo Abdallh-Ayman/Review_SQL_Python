@@ -466,6 +466,8 @@ ON o.customer_id = c.customer_id
 -- we Write the table name because the two column have the same name
 ````
 **joining two tables that didn't have relation (primary and foreign key)**  
+
+https://www.hackerrank.com/challenges/the-report/problem  
 <div style="display: flex; justify-content: space-between;">
 
 | ID | Name     | Marks |
