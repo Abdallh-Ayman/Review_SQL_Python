@@ -369,7 +369,7 @@ ORDER BY quantity * unit_price DESC
  ```
  OUTPUT 
  | Country | Count | 
-| -------- | -------- |
+| ------ | ------ |
 | CN | 6 |
 | IN | 6 |     
 
