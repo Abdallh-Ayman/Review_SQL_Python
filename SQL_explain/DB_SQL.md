@@ -128,9 +128,9 @@ CREATE TABLE Persons (
 **identity**: Use an Identity column when you need a unique, automatically incremented value for each row in a specific table. usualy used in primary key.  
 **Sequence Object**: Sequence Object is a database object that generates a sequence of numerical values according to a defined pattern. It's essentially a generator of sequential numbers that can be used for various purposes within a database.  
 1- Sequential Number Generation: A Sequence Object generates a sequence of numeric values in ascending or descending order, following a specified pattern.  
-2- Defined Range and Increment: When creating a Sequence Object, you can specify the starting value, the increment value (how much to increase or decrease by), the minimum and maximum values, and whether the sequence should cycle or not (restart from the beginning after reaching the maximum or minimum value).  
-3- Independence from Tables: Unlike auto-increment columns in tables, a Sequence Object is independent of any specific table. It generates sequential numbers separately from the data in the database and can be used across multiple tables or even databases.  
-4-Usage Scenarios: Sequence Objects are handy when you need to generate unique identifiers for rows in a table, create a series of numbers for various purposes (such as invoice numbers, order numbers, or unique keys), or maintain a specific sequence for specific operations without relying on the data in a table.  
+2- Defined **Range** and Increment: When creating a Sequence Object, you can specify the starting value, the increment value (how much to increase or decrease by), the minimum and maximum values, and whether the sequence should cycle or not (restart from the beginning after reaching the maximum or minimum value).  
+3- **Independence** from Tables: Unlike auto-increment columns in tables, a Sequence Object is independent of any specific table. It generates sequential numbers separately from the data in the database and c**an be used across multiple tables or even databases**.  
+4-Usage Scenarios: Sequence Objects are handy when you need to generate unique identifiers for rows in a table, create a series of numbers for various purposes (such as invoice numbers, order numbers, or unique keys), or**maintain a specific sequence** for specific operations without relying on the data in a table.  
 
 ```sql
 --Create Sequence Object 
@@ -374,6 +374,9 @@ ORDER BY quantity * unit_price DESC
 | IN | 6 |     
 
 Write a query to print the hacker_id, name, and the total number of challenges created by each student. Sort your results by the total number of challenges in descending order. If more than one student created the same number of challenges, then sort the result by hacker_id. If more than one student created the same number of challenges and the count is less than the maximum number of challenges created, then exclude those students from the result.   
+
+https://www.hackerrank.com/challenges/challenges/problem?isFullScreen=true  
+
 <div style="display: flex; justify-content: space-between;">
 
 | hacker_id | name |
@@ -512,6 +515,9 @@ where gr is not null
 order by gr desc, Name
 ```   
 Write a query to output the names of those students whose best friends got offered a higher salary than them. Names must be ordered by the salary amount offered to the best friends. It is guaranteed that no two students got same salary offer.  
+
+https://www.hackerrank.com/challenges/placements/problem?isFullScreen=true  
+
 <div style="display: flex; justify-content: space-between;">
 
 | ID | Friend_ID |
@@ -528,7 +534,7 @@ Write a query to output the names of those students whose best friends got offer
 | 3 | 11.55 |
 | 4 | 12.12 |
 
-| hacker_id | name |
+| ID | name |
 | --- | --- |
 | 1 | Ashley |
 | 2 | Samantha |
