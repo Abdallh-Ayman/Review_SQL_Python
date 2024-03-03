@@ -1367,7 +1367,7 @@ In summary, table statistics are a crucial part of the database's optimization p
     AS RANGE LEFT FOR VALUES (
         '2023-01-01', '2023-02-01', '2023-03-01', ...
     );
-
+    
     ```   
 
     3. Create the Partition Scheme:  

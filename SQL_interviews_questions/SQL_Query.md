@@ -102,18 +102,18 @@ ORDER BY EmpDeptCount ASC;
 **Q18. Write a query to calculate the even and odd records from a table.**
 To retrieve the even records from a table, you have to use the MOD() function as follows:
 ```sql
-SELECT EmpID FROM (SELECT rowno, EmpID from EmployeeInfo) WHERE MOD(rowno,2)=0;
+SELECT * FROM  EmployeeInfo WHERE MOD(Empid,2)=0;
+
+SELECT * FROM  EmployeeInfo WHERE MOD(Empid,2)=1;
 ```
-Similarly, to retrieve the odd records from a table, you can write a query as follows:
-```sql
-SELECT EmpID FROM (SELECT rowno, EmpID from EmployeeInfo) WHERE MOD(rowno,2)=1;
-```
+
 **Q19. Write a SQL query to retrieve employee details from EmployeeInfo table who have a date of joining in the EmployeePosition table.**
 ```sql
 SELECT * FROM EmployeeInfo E 
 WHERE EXISTS 
 (SELECT * FROM EmployeePosition P WHERE E.EmpId = P.EmpId);
 
+--OR
 SELECT *
 FROM EmployeeInfo
 JOIN EmployeePosition ON EmployeeInfo.EmployeeID = EmployeePosition.EmployeeID
@@ -151,10 +151,23 @@ WHERE N = (
     SELECT COUNT(DISTINCT Salary)
     FROM EmployeePosition e2
     WHERE e1.Salary <= e2.Salary);
+
+--OR
+WITH RankedSalaries AS (
+    SELECT
+        Salary,
+        DENSE_RANK() OVER (ORDER BY Salary DESC) AS SalaryRank
+    FROM YourTableName
+)
+
+SELECT Salary
+FROM RankedSalaries
+WHERE SalaryRank = N;
+
 ```
 **Q22. Write a query to retrieve duplicate records from a table.**
 ```sql
-SELECT EmpID, EmpFname, Department COUNT(*) 
+SELECT EmpID, EmpFname, Department, COUNT(*) 
 FROM EmployeeInfo GROUP BY EmpID, EmpFname, Department 
 HAVING COUNT(*) > 1;
 ```
