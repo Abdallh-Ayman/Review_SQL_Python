@@ -668,7 +668,7 @@ where EmpSalaryRank = 1
 ## CTEs,tables, Stored procedures, Function , Views
 - **CTEs**   
  CTEs(veiw in memory) stands for Common Table Expressions, which is a temporary result set that is defined within the execution of a single SQL statement. In other words, CTEs allow you to create a named query that can be referenced multiple times within the same SQL statement.CTEs are not functions in the sense that they do not take input parameters or return values, and they do not encapsulate a block of code that can be called from different parts of your code.  
- CTEs allow you to **simplify complex queries** by breaking them down into smaller, more manageable readable and maintainable. And increase the performance.
+ CTEs allow you to **simplify complex queries** by breaking them down into smaller, more manageable **readable** and **maintainable**. And increase the **performance**.
 ```sql
  WITH my_cte AS (
     SELECT column1, column2, ...
@@ -697,11 +697,10 @@ AS
 WITH CTE 
 AS
 (
-SELECT 1 [StatusId], [dbo].[ufnGetSalesOrderStatusText](1) [StatusName]  -- this called query that run in the first
+SELECT 1 [StatusId], [dbo].[ufnGetSalesOrderStatusText](1) [StatusName]  -- this called Base query that run in the first
 UNION ALL
-SELECT [StatusId] + 1, [dbo].[ufnGetSهحاول اشرح فى البوست ده الrecrcieve Common Table Epression [CTE] 
-alesOrderStatusText]([StatusId] + 1) [StatusName]
-FROM CTE                                                                                    --recrusive part of the query
+SELECT [StatusId] + 1, [dbo].[ufnGetSalesOrderStatusText]([StatusId] + 1) [StatusName]    -- recrusive part of the query we should add or anything to don't make infinty loop (recrcieve Common Table Epression [CTE]) 
+FROM CTE                                                                                    
 WHERE [StatusId] < 6
 )
 SELECT [StatusId], [StatusName]
@@ -714,7 +713,7 @@ FROM CTE
 To make the code more secure you should  make any code that will executed from the data base must be either a **procedures** or a **function**.  
 **Functions** are useful for encapsulating **calculations**, transformations, or lookups that need to be used in various SQL queries.  
 -It can be used in where or select statement to be part of this statement.       
--**Function** can't contain any dml(insert, update, delete) **only contain select select statment and insert in new table variable not table in our database**  
+-**Function** can't contain any dml(insert, update, delete) **only contain select statment and insert in new table variable not table in our database**  
 
 
 - **function**  
@@ -759,7 +758,7 @@ BEGIN
 END;
 SELECT dbo.CheckStudentName(1) AS 'Message'; -- you should write schema as sql server don't consider it as builtin function 
 ```
-**Inline table function** --> return table only contain select like view  
+**Inline table function** --> return table. only contain select like view  
 return table as a result of select statment  
 ```sql
 --5 Create inline function that takes integer which represents manager ID and displays department name, Manager Name and hiring date 
@@ -825,7 +824,7 @@ SELECT * FROM dbo.GetStudentInfo('first name');
 - **Stored procedures**   
 **Stored procedures** can be reused across different parts of your application, reducing code duplication. To deal with our **data base**.
 --Can write all query type DDL , DML , insert , update delete.  
--- have **more performance** on the **network traffic**(have less character while sending as a call ) and **our engine** (it stored so we don't need make all cycle of execution plane again )  
+-- have **more performance** on the **network traffic**(have less character while sending as a call from application to the DB) and **our engine** (it stored so we don't need make all cycle of execution plane again )  
 -- secure because I can hide business role inside it.  
 -- catch error before happen in the data base .  
 -- **return**:It's not mandatory to return a value like function. it can **return** integer (number) but this number have meaning or tell us the behaviour of the SP for the database developer or application programmer.  
@@ -857,8 +856,7 @@ Stored procedures in a database can have different types of parameters, and thes
 
 **Example:**
 ```sql
-CREATE PROCEDURE GetCustomerInfo
-    @CustomerID INT  -- @CustomerID is an input parameter
+CREATE PROCEDURE GetCustomerInfo @CustomerID INT  -- @CustomerID is an input parameter
 AS
 BEGIN
     SELECT * FROM Customers WHERE CustomerID = @CustomerID;
@@ -925,7 +923,7 @@ END;
 
 **Example:**
 ```sql
-CREATE TYPE dbo.EmployeeTableType AS TABLE
+CREATE TYPE dbo.EmployeeTableType AS TABLE    --create type --> is to create a new custom data type.
 (
     EmployeeID INT,
     EmployeeName NVARCHAR(50),
@@ -938,7 +936,7 @@ AS
 BEGIN
     INSERT INTO Employees (EmployeeID, EmployeeName)
     SELECT EmployeeID, EmployeeName FROM @Employees;
-END;
+END;    
 ```
 
 - **Views**  
@@ -947,6 +945,7 @@ Views are generally read-only and used for data retrieval. You cannot directly p
 --View increase security not performance.
 ```sql
 CREATE VIEW view_name(col1,col2,..)--to make alis name for the column 
+with encryption   -- for hide view detials from user(developer)
 AS
 SELECT column1, column2, ...
 FROM some_table
@@ -1028,7 +1027,7 @@ where fullname='ahmed ali '
 
 ----
 ## ACID
-ACID Is transaction proparity 
+ACID Is transaction proparity   
 -- **Atomicity**   All changes to data are performed as if they are a single operation. That is, all the changes are performed, or none of them are.    
 -- **Consistency** constrain active, Data is in a consistent state when a transaction starts and when it ends    
 -- **Isolation** - locks, The intermediate state of a transaction is invisible to other transactions. As a result, transactions that run concurrently appear to be serialized.  
@@ -1080,8 +1079,7 @@ Primary Key Constraint,Foreign Key Constraint, Unique Constraint (allow one null
 StudentID INT PRIMARY KEY,
 StudentName VARCHAR(50), 
 OrderID INT PRIMARY KEY,
-CustomerID INT FOREIGN KEY REFERENCES 
-Customers(CustomerID),
+CustomerID INT FOREIGN KEY REFERENCES Customers(CustomerID),
 OrderDate DATE,
 EmployeeID INT UNIQUE, 
 Price DECIMAL(10, 2) CHECK (Price >= 0)
@@ -1095,8 +1093,8 @@ Content VARCHAR(255) DEFAULT 'No content');
 	3- Can't make multiple rule on one column.as the columm have one data type and we add this rule on that column.  
 	4- Can create new data type.  
 ```sql
-CREATE RULE CheckAgeAS @Age >= 18 AND @Age <= 100
-sp_bindrule 'CheckAge', 'Employees.Age'
+CREATE RULE CheckAge AS @Age >= 18 AND @Age <= 100
+sp_bindrule 'CheckAge', 'Employees.Age'          -- table.column         sp_bindrule it is built in stored procedure 
 sp_unbindrule 'CheckAge', 'Employees.Age'  -- to delte the rule you should unbind it 
 drop rule CheckAgeAS                       -- delete it 
 
@@ -1219,13 +1217,13 @@ deallocate c1
 ## Optimization query
   ### database statistic 
 
-table statistics in a relational database, such as SQL Server, provide information about the distribution of data within a table. These statistics help the query optimizer make informed decisions when creating execution plans for queries. Let's break it down:
+table statistics in a relational database, such as SQL Server, provide information about the **distribution** of data within a table. These statistics **help the query optimizer** make informed decisions when creating execution plans for queries. Let's break it down:
 
 ### 1. What are Table Statistics?
 
 **Definition:**
 - **Table Statistics** are metadata about the data distribution in a table.
-- They include information about the number of rows, the distribution of values in columns, and other relevant data characteristics.so the optmizer make Cardinality estimation cost based on those tables statistics.  
+- They include information about the **number of rows**, the **distribution of values in columns**, and other relevant data characteristics.so the optmizer **make Cardinality estimation** cost based on those tables statistics.
 
 ### 2. Why are Table Statistics Important?
 
@@ -1271,7 +1269,7 @@ In summary, table statistics are a crucial part of the database's optimization p
  **Optimizing** a query in SQL Server involves various techniques and strategies to improve Qyery performance.The query optimizer's goal is to minimize the cost of executing the query while considering various factors, and it achieves this by exploring and selecting the most efficient logical and physical plans.  
 
 1. **Use Indexes:**
-   - Ensure that appropriate indexes are created on columns used in WHERE clauses and JOIN conditions.
+   - Ensure that appropriate indexes are created on columns that is regularly used in WHERE clauses and JOIN conditions.(we can use sql server profilier and sql server tuning advisor to give recommendations on column  that is regularly used in select where and join)
    - Consider covering indexes to include all columns needed for a query in the index itself.
    - if the range of search is very large (ex: between 1 and 2000) the optimizer could choose the whole table scan instead of the index scan as the index scan will scan alot of pages and could scan the specific page multiple times this could take more time than the whole table scan.and there is could be database that can store the page in there cashe so it doesn't need to make scan again.
    ```sql
@@ -1286,7 +1284,7 @@ In summary, table statistics are a crucial part of the database's optimization p
    UPDATE STATISTICS your_table;
    ```
 
-3. **Avoid SELECT *:**
+3. **Avoid SELECT * :**
    - Instead, specify only the columns you need. This reduces the amount of data that needs to be read.
 
    ```sql
@@ -1322,8 +1320,7 @@ In summary, table statistics are a crucial part of the database's optimization p
    ```
 
 7. **Consider Query Execution Plan:**
-   - Use `EXPLAIN` or `SHOWPLAN` to understand how SQL Server is executing your query. This can help identify performance bottlenecks.
-
+   - Use `EXPLAIN` or `SHOWPLAN` to understand how SQL Server is executing your query. This can help identify performance bottlenecks. and also to see the actual time and estmated time by the optmizer and compare them together and check why the optimizer choose these plan. 
    ```sql
    EXPLAIN SELECT column1 FROM your_table WHERE column2 = 'value';
    ```
