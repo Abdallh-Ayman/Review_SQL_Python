@@ -1301,15 +1301,16 @@ In summary, table statistics are a crucial part of the database's optimization p
    INNER JOIN table2 ON table1.id = table2.id;
    ```
 
-5. **Limit the Result Set:**
-   - Use `TOP` or `LIMIT` clauses to limit the number of rows returned, especially if you don't need all rows.
+5. **Limit the Result Set: and avoide use select distinct**
+   - Use `TOP` or `LIMIT` clauses to limit the number of rows returned, especially if you don't need all rows. and avoide use select distinct
 
    ```sql
    SELECT TOP 10 column1 FROM your_table;
    ```
 
+
 6. **Avoid Functions in WHERE Clauses:**
-   - Functions in WHERE clauses can prevent the use of indexes. Try to avoid them if possible.
+   - Functions in WHERE clauses can prevent the use of indexes. Try to avoid them if possible. don't use function in the left of the equation use it in the right side.
 
    ```sql
    -- Avoid this
@@ -1332,8 +1333,65 @@ In summary, table statistics are a crucial part of the database's optimization p
 9. **Use Stored Procedures:**
    - Stored procedures can be pre-compiled and cached, providing better performance.
 
-10. **Consider Partitioning:**
+10. **avoid subquery**
+   - avoid subquery and use joins , CTE Or Temp table instead of that
+
+11. **avoid using multiple OR Condition**
+   - instead of using multiple OR use IN operator or union all
+   ```sql
+    -- don't use this
+      WHERE state 'VA' OR 'GA'OR  'FL' 
+    --use this  
+    WHERE state IN ('VA' ,'GA', 'FL')      
+   ```
+
+12. **avoid using NOT**
+   - instead of using multiple OR use IN operator or union all
+     
+
+13. **use exists instead of IN with subquery**
+   - use exists instead of IN with subquery
+
+
+14. **Consider Partitioning:**
     - For large tables, consider partitioning based on certain criteria, which can improve query performance.
+    Certainly! Here's a summary of creating a partitioned table using a simplified example:
+    1. Choose a Partitioning Key:
+        - Select a column that will be the basis for partitioning. In this example, it's the Date column.
+
+    2. Create the Partition Function:
+        - Define a partition function to determine how data will be divided into partitions. For instance, create a monthly partition function.  
+
+    ```sql
+    CREATE PARTITION FUNCTION DatePartitionFunction (DATE)
+    AS RANGE LEFT FOR VALUES (
+        '2023-01-01', '2023-02-01', '2023-03-01', ...
+    );
+
+    ```   
+
+    3. Create the Partition Scheme:  
+        - Establish a partition scheme to map partitions to physical filegroups. For simplicity, create a single filegroup.  
+
+    ```sql   
+    CREATE PARTITION SCHEME DatePartitionScheme
+    AS PARTITION DatePartitionFunction
+    TO ( [PRIMARY] );
+    ```
+    4. Alter the Table to Use Partitioning:
+         - Modify the existing table to use the partition scheme. Create a clustered index on the chosen column (e.g., Date) using the partition scheme.
+
+    ```sql   
+    ALTER TABLE SalesTransactions
+    DROP CONSTRAINT [PK_SalesTransactions] WITH ( ONLINE = OFF )
+    GO
+
+    CREATE CLUSTERED INDEX CIX_SalesTransactions_Date
+    ON SalesTransactions (Date)
+    WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF)
+    ON DatePartitionScheme(Date);
+    ```  
+This process results in a partitioned table where data is organized based on the specified column (in this case, Date), and each partition corresponds to a specific range (e.g., month). Partitioning is beneficial for improving query performance, especially with large datasets.
 
 ## query lifecycle how optimizer work 
 
@@ -1345,7 +1403,7 @@ Certainly! The process of query optimization involves the generation of both log
 
 **Definition:**
 - The logical query plan represents the high-level, abstract description of how the database engine should retrieve or modify the data to fulfill the query.
-- It focuses on the logical relationships between tables and the operations that need to be performed.
+- It focuses on the logical **relationships between tables** and the **operations that need** to be performed.
 
 **Key Components:**
 - **Table Access Methods:** Describes how tables are accessed, such as full table scans or index seeks.
@@ -1372,7 +1430,7 @@ The logical plan might describe the following operations:
 
 **Definition:**
 - The physical query plan details the actual steps and methods the database engine will use to execute the query efficiently.
-- It involves decisions on how to access data, which indexes to use, and the order of operations.
+- It involves decisions on **how to access data**, which indexes to use, and the **order of operations**.
 
 **Key Components:**
 - **Index Usage:** Specifies which indexes will be utilized for table access or joins.
