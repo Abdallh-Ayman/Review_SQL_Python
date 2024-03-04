@@ -1346,7 +1346,7 @@ In summary, table statistics are a crucial part of the database's optimization p
    ```
 
 12. **avoid using NOT**
-   - instead of using multiple OR use IN operator or union all
+   - Using NOT in WHERE clauses can sometimes prevent the query optimizer from effectively utilizing indexes. Try to rephrase your conditions to use positive logic whenever possible, or consider alternative approaches to achieve the same result.
      
 
 13. **use exists instead of IN with subquery**
