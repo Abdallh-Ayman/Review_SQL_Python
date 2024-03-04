@@ -188,6 +188,11 @@ WHERE (employee_name) NOT IN (
     GROUP BY employee_name
     HAVING COUNT(*) > 1);
 ```
+- **window functions** may be faster than group by, especially if you want to perform **multiple calculations**( ranking, percentage, difference, or cumulative sum) on the same group of rows.
+- **group by** may be faster than window functions, especially if you only want to perform a **single calculation**(average, maximum, or count.) on each group of rows 
+- **use window function** :If there are **many distinct groups** in your dataset and only a few duplicates within each group,This is because window functions operate on a per-row basis and don't require grouping the entire dataset. 
+- **use GROUP BY**: if there are **few distinct groups** with a significant number of duplicates within each group, as it aggregates the data based on the grouped column directly.
+
 **Q23. Write a query to retrieve the list of employees working in the same department.**
 ```sql
 Select DISTINCT E.EmpID, E.EmpFname, E.Department 
