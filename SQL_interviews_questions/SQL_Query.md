@@ -479,7 +479,7 @@ HAVING COUNT(*) = 1;  -- Filter to include only unique values
 
 WITH CTE AS (
     SELECT ename,
-           COUNT(*) AS Frequency,                                                      -- if we use any aggrigate we must use group by with rownum
+           COUNT(*) AS Frequency,                                  -- if we use any aggrigate we must use group by with other column without need to write the rownum(window function)
            ROW_NUMBER() OVER (PARTITION BY ename ORDER BY (select null)) AS row_num
     FROM emp
     GROUP BY ename
