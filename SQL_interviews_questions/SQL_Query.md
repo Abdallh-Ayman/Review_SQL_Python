@@ -473,6 +473,32 @@ SELECT ename, COUNT(*) AS Frequency
 FROM emp
 GROUP BY ename
 HAVING COUNT(*) > 1; -- Filter to include only duplicated values
+HAVING COUNT(*) = 1;  -- Filter to include only unique values
+
+-- using ROW_NUMBER() 
+
+WITH CTE AS (
+    SELECT ename,
+           COUNT(*) AS Frequency,                                                      -- if we use any aggrigate we must use group by with rownum
+           ROW_NUMBER() OVER (PARTITION BY ename ORDER BY (select null)) AS row_num
+    FROM emp
+    GROUP BY ename
+)
+SELECT ename, Frequency
+FROM CTE
+WHERE Frequency > 1
+ORDER BY Frequency DESC;
+
+-- if you want to see the duplicated value only without considering frequency:
+WITH CTE AS (
+    SELECT ename,
+			eadress,       
+           ROW_NUMBER() OVER (PARTITION BY ename ORDER BY (SELECT NULL)) AS row_num
+    FROM emp
+)
+SELECT ename, eadress, row_num
+FROM CTE
+
 ```
 ![alt text](like.jpg)
 ```sql
