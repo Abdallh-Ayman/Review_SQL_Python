@@ -459,7 +459,10 @@ order by cte.total_challenge desc,hacker_id
 **right anti join**: returns the rows from the right table that are not in the left table.  
 **left anti join**: returns the rows from the left table that are not in the right table.  
 **Full Outer Join**: Returns all the rows from both tables, including those where there is no match in either table.  
-**Cross Join**: Returns all possible combinations of rows from both tables.
+**Cross Join**: Returns all possible combinations of rows from both tables.  
+**self join**:we consider the first row of the table is the left table and second row of the table is the right table to write the condition Easly with the above note .  
+Since each row from the original table is matched with every row where the ID is the same, you get a duplication of rows. For example, if there are 4 rows with ID=1 in the original table, and 4 rows with ID=1 in the joined table, you'll get 16 rows in the result set (4x4=16). This multiplication of rows occurs for each unique ID in the original table.  
+
 
 ````sql
 Select order_id, c.customer_id, first_name    --select specific column
