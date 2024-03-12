@@ -667,7 +667,136 @@ select * from
 FROM [tblEmployee] )  tb1 
 where EmpSalaryRank = 1
 ```
------
+
+- **Running tatal** :want to calculate a running total of sales within a certain period.
+    ```sql
+    SELECT 
+    SUM(sales) OVER (PARTITION BY store_id ORDER BY sale_date) AS running_total
+    FROM sales;
+    ```
+- **Value Comparison**: These functions allow you to compare values in a dataset, such as comparing each employee’s salary to the average salary in their department.
+    ```sql
+    SELECT 
+    employee_id, 
+    salary, 
+    AVG(salary) OVER (PARTITION BY department) AS avg_department_salary
+    FROM employees;
+    ```
+- **Windowing(moving average)**: These functions perform calculations across a range of rows relative to the current row. For example, you might want to calculate a **moving average**.
+    - OVER (ORDER BY sale_date ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING): This **defines a window** over which the average is calculated. The window is ordered by sale_date, and for each row, it includes:
+        - The current row (ORDER BY sale_date)
+        - The row before it (1 PRECEDING)
+        - The row after it (1 FOLLOWING)
+    ```sql 
+    SELECT 
+    AVG(sales) OVER (ORDER BY sale_date ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS moving_average
+    FROM sales;
+    ```
+    |sale_date|	sales |	moving_average|
+    | --- | --- | --- |
+    |2021-01-01|	100	|150|
+    |2021-01-02|	200|	133|
+    |2021-01-03	|100	|116|
+    |2021-01-04|	50|	75|
+
+- **RANK**: This function assigns a unique rank to each row within the partition, **with gaps** in the ranking for tied rows. If two or more rows tie for a rank, they receive the same rank number, and the next rank number is **incremented by the number of tied rows**. For example, if two rows are tied for rank 1, they both receive rank 1, but the next row receives rank 3, not rank 2.
+- **DENSE_RANK**: This function also assigns a unique rank to each row within the partition, but **without gaps**. It increments the rank number by 1, regardless of the number of tied rows. For example, if two rows are tied for rank 1, they both receive rank 1, and the next row receives rank 2, even if there are multiple rows with the same score.
+- **NTILE()**: This function divides an ordered dataset into a specified number of roughly equal groups, called ‘tiles’. For example, NTILE(4) would split the data into four groups. The function then assigns a group number to each row1.
+- **LEAD()**: This function allows you to access data from the next row in the same result set, without having to join the table to itself. It’s useful for comparing current row values with those of subsequent rows2.
+- **LAG()**: Similar to LEAD(), but instead of looking forward, LAG() lets you access data from a previous row. This is handy for comparing current row values with those of preceding rows3.
+- **FIRST_VALUE()**: This function returns the first value in an ordered set of values within a partition. It’s useful when you need to compare other row values to the first one in the set4.
+- **LAST_VALUE()**: The opposite of FIRST_VALUE(), this function returns the last value in an ordered set within a partition. It’s often used in conjunction with the ROWS or RANGE windowing clauses to specify the set’s bounds5.
+- **PERCENT_RANK()**: This function calculates the relative rank of a row within a partition of a result set as a percentage. The value ranges from 0 (first row) to 1 (last row), giving you the percentile rank of a row6.
+- **CUME_DIST()**: This function calculates the cumulative distribution of a value within a set of values. It returns the proportion of rows with values less than or equal to the current row’s value.
+
+```sql 
+CREATE TABLE Orderss (
+    OrderID INT,
+    CustomerID INT,
+    OrderDate DATE,
+    OrderTotal DECIMAL(10, 2)
+);
+
+INSERT INTO Orderss (OrderID, CustomerID, OrderDate, OrderTotal)
+VALUES 
+    (1, 101, '2024-01-10', 150.00),
+    (2, 102, '2024-01-12', 200.00),
+    (3, 101, '2024-02-05', 300.00),
+    (4, 103, '2024-02-10', 250.00),
+    (5, 102, '2024-03-01', 180.00),
+    (6, 101, '2024-03-15', 350.00),
+    (7, 103, '2024-03-20', 350.00),
+	(8, 103, '2024-03-20', 400.00);
+```
+- **ROW_NUMBER, RANK, DENSE_RANK** Example
+    ```sql
+    SELECT 
+        OrderID,
+        OrderDate,
+        CustomerID,
+        OrderTotal,
+        ROW_NUMBER() OVER (ORDER BY OrderDate) AS RowNum,
+        RANK() OVER (ORDER BY OrderTotal) AS Rank,
+        DENSE_RANK() OVER (ORDER BY OrderTotal) AS DenseRank
+        from Orderss
+    ```
+    | OrderID | OrderDate  | CustomerID | OrderTotal | RowNum | Rank | DenseRank |
+    | ------- | ---------- | ---------- | ---------- | ------ | ---- | --------- |
+    | 1       | 2024-01-10 | 101        | 150.00     | 1      | 1    | 1         |
+    | 5       | 2024-03-01 | 102        | 180.00     | 2      | 2    | 2         |
+    | 2       | 2024-01-12 | 102        | 200.00     | 3      | 3    | 3         |
+    | 4       | 2024-02-10 | 103        | 250.00     | 4      | 4    | 4         |
+    | 3       | 2024-02-05 | 101        | 300.00     | 5      | 5    | 5         |
+    | 6       | 2024-03-15 | 101        | 350.00     | 6      | 6    | 6         |
+    | 7       | 2024-03-20 | 103        | 350.00     | 7      | 6    | 6         |
+    | 8       | 2024-03-20 | 103        | 400.00     | 8      | 8    | 7         |
+
+- **NTILE, LEAD, LAG** Example
+    ```sql
+    SELECT 
+        OrderTotal,
+        NTILE(4) OVER (ORDER BY OrderTotal) AS Quartile,
+        LEAD(OrderTotal, 1) OVER (ORDER BY OrderTotal) AS NextOrderDate,
+        LAG(OrderTotal, 1) OVER (ORDER BY OrderTotal) AS PreviousOrderDate
+        from Orderss
+    ```
+        | OrderTotal | Quartile | NextOrderDate | PreviousOrderDate |
+        | ---------- | -------- | ------------- | ----------------- |
+        | 150.00     | 1        | 180.00        | NULL              |
+        | 180.00     | 1        | 200.00        | 150.00            |
+        | 200.00     | 2        | 250.00        | 180.00            |
+        | 250.00     | 2        | 300.00        | 200.00            |
+        | 300.00     | 3        | 350.00        | 250.00            |
+        | 350.00     | 3        | 350.00        | 300.00            |
+        | 350.00     | 4        | 400.00        | 350.00            |
+        | 400.00     | 4        | NULL          | 350.00            |
+
+- **FIRST_VALUE, LAST_VALUE ,SUM, PERCENT_RANK, CUME_DIST** Example
+    ```sql
+    SELECT 
+        OrderID,
+        OrderDate,
+        CustomerID,
+        OrderTotal,
+        FIRST_VALUE(OrderDate) OVER (PARTITION BY CustomerID ORDER BY OrderDate) AS FirstOrderDate,
+        LAST_VALUE(OrderDate) OVER (PARTITION BY CustomerID ORDER BY OrderDate ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS LastOrderDate,
+        SUM(OrderTotal) OVER (PARTITION BY CustomerID ORDER BY OrderDate) AS RunningTotal,
+        PERCENT_RANK() OVER (PARTITION BY CustomerID ORDER BY OrderTotal) AS PricePercentRank,
+        CUME_DIST() OVER (PARTITION BY CustomerID ORDER BY OrderTotal) AS CumulativeDistribution -- It counts how many orders have an OrderTotal that is less than or equal to 150.00. In this case, it’s just the one order itself. It then divides this count by the total number of orders. If there are three orders in total, it divides 1 by 3. so for the first row 150 = 1 /3
+        from Orderss
+    ```
+    | OrderID | OrderDate  | CustomerID | OrderTotal | FirstOrderDate | LastOrderDate | RunningTotal | PricePercentRank | CumulativeDistribution |
+    | ------- | ---------- | ---------- | ---------- | -------------- | ------------- | ------------ | ---------------- | ---------------------- |
+    | 1       | 2024-01-10 | 101        | 150.00     | 2024-01-10     | 2024-03-15    | 150.00       | 0                | 0.333333333333333     |
+    | 3       | 2024-02-05 | 101        | 300.00     | 2024-01-10     | 2024-03-15    | 450.00       | 0.5              | 0.666666666666667     |
+    | 6       | 2024-03-15 | 101        | 350.00     | 2024-01-10     | 2024-03-15    | 800.00       | 1                | 1                      |
+    | 5       | 2024-03-01 | 102        | 180.00     | 2024-01-12     | 2024-03-01    | 380.00       | 0                | 0.5                    |
+    | 2       | 2024-01-12 | 102        | 200.00     | 2024-01-12     | 2024-03-01    | 200.00       | 1                | 1                      |
+    | 4       | 2024-02-10 | 103        | 250.00     | 2024-02-10     | 2024-03-20    | 250.00       | 0                | 0.333333333333333     |
+    | 7       | 2024-03-20 | 103        | 350.00     | 2024-02-10     | 2024-03-20    | 1000.00      | 0.5              | 0.666666666666667     |
+    | 8       | 2024-03-20 | 103        | 400.00     | 2024-02-10     | 2024-03-20    | 1000.00      | 1                | 1                      |
+
+-------
 ## CTEs,tables, Stored procedures, Function , Views
 - **CTEs**   
  CTEs(veiw in memory) stands for Common Table Expressions, which is a temporary result set that is defined within the execution of a single SQL statement. In other words, CTEs allow you to create a named query that can be referenced multiple times within the same SQL statement.CTEs are not functions in the sense that they do not take input parameters or return values, and they do not encapsulate a block of code that can be called from different parts of your code.  
