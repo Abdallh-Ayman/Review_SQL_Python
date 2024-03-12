@@ -673,7 +673,55 @@ where EmpSalaryRank = 1
     SELECT 
     SUM(sales) OVER (PARTITION BY store_id ORDER BY sale_date) AS running_total
     FROM sales;
+    
+    Input: CoffeeShop table:
+    +----+------------------+
+    | id | drink            |
+    +----+------------------+
+    | 9  | Mezcal Margarita |
+    | 6  | null             |
+    | 7  | null             |
+    | 3  | Americano        |
+    | 1  | Daiquiri         |
+    | 2  | null             |
+    +----+------------------+
+    Output: 
+    +----+------------------+
+    | id | drink            |
+    +----+------------------+
+    | 9  | Mezcal Margarita |
+    | 6  | Mezcal Margarita |
+    | 7  | Mezcal Margarita |
+    | 3  | Americano        |
+    | 1  | Daiquiri         |
+    | 2  | Daiquiri         |
+    +----+------------------+
+
+     solution
+
+    | id | drink             | rk | Case_when | gid |
+    |----|-------------------|----|-------------------|-----|
+    | 1  | Daiquiri          | 1  | 1                 | 1   |
+    | 2  | NULL              | 2  | 0                 | 1   |
+    | 3  | Americano         | 3  | 1                 | 2   |
+    | 6  | NULL              | 4  | 0                 | 2   |
+    | 7  | NULL              | 5  | 0                 | 2   |
+    | 9  | Mezcal Margarita  | 6  | 1                 | 3   |
+
+    WITH S AS (
+        SELECT *, ROW_NUMBER() OVER (ORDER BY id) AS rk
+        FROM CoffeeShop
+    ),
+    T AS (
+        SELECT *,
+            SUM(CASE WHEN drink IS NULL THEN 0 ELSE 1 END) OVER (ORDER BY rk) AS Cumulative
+        FROM S
+    )
+
+    SELECT id, first_value(drink) OVER (PARTITION BY Cumulative ORDER BY rk) AS drink
+    FROM T;
     ```
+
 - **Value Comparison**: These functions allow you to compare values in a dataset, such as comparing each employee’s salary to the average salary in their department.
     ```sql
     SELECT 
@@ -797,7 +845,7 @@ VALUES
     | 8       | 2024-03-20 | 103        | 400.00     | 2024-02-10     | 2024-03-20    | 1000.00      | 1                | 1                      |
 
 -------
-## CTEs,tables, Stored procedures, Function , Views
+## CTEs, Function, Stored procedures , Views
 - **CTEs**   
  CTEs(veiw in memory) stands for Common Table Expressions, which is a temporary result set that is defined within the execution of a single SQL statement. In other words, CTEs allow you to create a named query that can be referenced multiple times within the same SQL statement.CTEs are not functions in the sense that they do not take input parameters or return values, and they do not encapsulate a block of code that can be called from different parts of your code.  
  CTEs allow you to **simplify complex queries** by breaking them down into smaller, more manageable **readable** and **maintainable**. And increase the **performance**.
