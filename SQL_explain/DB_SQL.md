@@ -778,7 +778,7 @@ VALUES
         OrderDate,
         CustomerID,
         OrderTotal,
-        FIRST_VALUE(OrderDate) OVER (PARTITION BY CustomerID ORDER BY OrderDate) AS FirstOrderDate,
+        FIRST_VALUE(OrderDate) OVER (PARTITION BY CustomerID ORDER BY OrderDate) AS FirstOrderDate, --Unbounded preceding” means it starts from the very first row in the partition, and “unbounded following” means it goes all the way to the last row.
         LAST_VALUE(OrderDate) OVER (PARTITION BY CustomerID ORDER BY OrderDate ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS LastOrderDate,
         SUM(OrderTotal) OVER (PARTITION BY CustomerID ORDER BY OrderDate) AS RunningTotal,
         PERCENT_RANK() OVER (PARTITION BY CustomerID ORDER BY OrderTotal) AS PricePercentRank,
