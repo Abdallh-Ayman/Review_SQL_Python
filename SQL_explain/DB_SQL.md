@@ -1120,7 +1120,17 @@ END;
 ```
 
 - **Views**  
-**Views** are **virtual tables** that are derived from the result of a SELECT query. It does not physically store the data itself; instead, it's a **saved SQL query** If the underlying data in the tables changes, the view reflects those changes immediately. They are used to simplify complex queries, encapsulate logic, and **provide an abstraction layer over the underlying tables**.   
+**Views** are **virtual tables** that are derived from the result of a SELECT query. It does not physically store the data itself; instead, it's a **saved SQL query** If the underlying data in the tables changes, the view reflects those changes immediately.  
+- They are used to simplify complex queries(by saving part of our query in object(veiw) in our database) 
+- encapsulate logic
+- rename column to new meaningful names and **provide an abstraction layer over the underlying tables**.
+
+types of views that serve different purposes:
+- **Simple and Complex Views**: Simple views are based on a single table, while complex views can be based on multiple tables and can include joins, subqueries, and other complex operations(note in those view we make it from the **same servers** or database )
+- **Partitioned Views**: These views join horizontally partitioned data from a set of member tables across one or more servers, making the data appear as if it comes from a single table.
+- **local partitioned view** :joins member tables on the same instance of SQL Server.
+- **Indexed Views**: These are materialized views where the view definition has been computed and the **resulting data stored** just like a table. You can create a unique **clustered index** on these views, which can improve query performance significantly, especially for queries that aggregate many rows. not best parctice if our data is regularly changed.
+
 Views are generally read-only and used for data retrieval. You cannot directly perform data manipulation operations (e.g., UPDATE, DELETE) on a view unless it's an "updatable" view based on certain conditions. <u>could make insert and update if the other column that isn't in the view allow null value and we couldn't delete from view</u>.  
 --View increase security not performance.
 ```sql
