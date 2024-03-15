@@ -891,6 +891,7 @@ FROM CTE
 ```
 
 To make the code more secure you should  make any code that will executed from the data base must be either a **procedures** or a **function**.  
+
 **Functions** are useful for encapsulating **calculations**, transformations, or lookups that need to be used in various SQL queries.  
 -It can be used in where or select statement to be part of this statement.       
 -**Function** can't contain any dml(insert, update, delete) **only contain select statment and insert in new table variable not table in our database**  
@@ -1466,7 +1467,7 @@ In summary, table statistics are a crucial part of the database's optimization p
    CREATE INDEX idx_example ON your_table(column1, column2);
    ```
 
-2. **Update Statistics:**
+2. **Update Statistics and indexes:**
    - Regularly update statistics to help the query optimizer make better decisions.
    -  you should rebuild or update the Statistics tables or index after inserting a bulk of large data to increase performance.
 
