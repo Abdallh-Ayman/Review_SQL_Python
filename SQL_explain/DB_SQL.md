@@ -129,8 +129,8 @@ CREATE TABLE Persons (
 **Sequence Object**: Sequence Object is a database object that generates a sequence of numerical values according to a defined pattern. It's essentially a generator of sequential numbers that can be used for various purposes within a database.  
 1- Sequential Number Generation: A Sequence Object generates a sequence of numeric values in ascending or descending order, following a specified pattern.  
 2- Defined **Range** and Increment: When creating a Sequence Object, you can specify the starting value, the increment value (how much to increase or decrease by), the minimum and maximum values, and whether the sequence should cycle or not (restart from the beginning after reaching the maximum or minimum value).  
-3- **Independence** from Tables: Unlike auto-increment columns in tables, a Sequence Object is independent of any specific table. It generates sequential numbers separately from the data in the database and c**an be used across multiple tables or even databases**.  
-4-Usage Scenarios: Sequence Objects are handy when you need to generate unique identifiers for rows in a table, create a series of numbers for various purposes (such as invoice numbers, order numbers, or unique keys), or**maintain a specific sequence** for specific operations without relying on the data in a table.  
+3- **Independence** from Tables: Unlike auto-increment columns in tables, a Sequence Object is independent of any specific table. It generates sequential numbers separately from the data in the database and **can be used across multiple tables or even databases**.  
+4-Usage Scenarios: Sequence Objects are handy when you need to generate unique identifiers for rows in a table, create a series of numbers for various purposes (such as invoice numbers, order numbers, or unique keys), or **maintain a specific sequence** for specific operations without relying on the data in a table.  
 
 ```sql
 --Create Sequence Object 
@@ -699,7 +699,7 @@ where EmpSalaryRank = 1
 
      solution
 
-    | id | drink             | rk | Case_when | gid |
+    | id | drink             | rk | Case_when | Cumulative |
     |----|-------------------|----|-------------------|-----|
     | 1  | Daiquiri          | 1  | 1                 | 1   |
     | 2  | NULL              | 2  | 0                 | 1   |
@@ -1460,16 +1460,16 @@ In summary, table statistics are a crucial part of the database's optimization p
  **Optimizing** a query in SQL Server involves various techniques and strategies to improve Qyery performance.The query optimizer's goal is to minimize the cost of executing the query while considering various factors, and it achieves this by exploring and selecting the most efficient logical and physical plans.  
 
 1. **Use Indexes:**
-   - Ensure that appropriate indexes are created on columns that is regularly used in WHERE clauses and JOIN conditions.(we can use sql server profilier and sql server tuning advisor to give recommendations on column  that is regularly used in select where and join)
+   - Ensure that appropriate indexes are created on columns that is regularly used in **WHERE clauses and JOIN conditions**.(we can use sql server profilier and sql server tuning advisor to give recommendations on column  that is regularly used in select where and join)
    - Consider covering indexes to include all columns needed for a query in the index itself.
-   - if the range of search is very large (ex: between 1 and 2000) the optimizer could choose the whole table scan instead of the index scan as the index scan will scan alot of pages and could scan the specific page multiple times this could take more time than the whole table scan.and there is could be database that can store the page in there cashe so it doesn't need to make scan again.
+   - if the **range** of search is very large (ex: between 1 and 2000) the optimizer could choose the whole table scan instead of the index scan as the index scan will scan alot of pages and could **scan the specific page multiple times** this could take more time than the whole table scan.and there is could be database that can store the page in there cashe so it doesn't need to make scan again.
    ```sql
    CREATE INDEX idx_example ON your_table(column1, column2);
    ```
 
 2. **Update Statistics and indexes:**
    - Regularly update statistics to help the query optimizer make better decisions.
-   -  you should rebuild or update the Statistics tables or index after inserting a bulk of large data to increase performance.
+   -  you should **rebuild** or update the Statistics tables or index after inserting a bulk of large data to increase performance.
 
    ```sql
    UPDATE STATISTICS your_table;
@@ -1512,7 +1512,7 @@ In summary, table statistics are a crucial part of the database's optimization p
    ```
 
 7. **Consider Query Execution Plan:**
-   - Use `EXPLAIN` or `SHOWPLAN` to understand how SQL Server is executing your query. This can help identify performance bottlenecks. and also to see the actual time and estmated time by the optmizer and compare them together and check why the optimizer choose these plan. 
+   - Use `EXPLAIN` or `SHOWPLAN` to understand how SQL Server is executing your query. This can help identify performance bottlenecks. and also to see the **actual time and estmated time** by the optmizer and compare them together and check why the optimizer choose these plan. 
    ```sql
    EXPLAIN SELECT column1 FROM your_table WHERE column2 = 'value';
    ```
