@@ -25,6 +25,8 @@
 isparse=yes:if you want to make the null don't take space on the desk. 
 - **Complex Attribute**
 ![Alt text](image-2.png)
+![alt text](image-12.png)
+![alt text](image-13.png)  
 
 **relationship type**
 - **degree** : unary(recursive,self join) , binary(two entity) , ternary(three entity or more) 
@@ -108,7 +110,7 @@ WHERE ProductID = 1;
  **Normalization** Normalization is a process used to organize and structure data within a database to **minimize redundancy and dependency issues**. The goal of normalization is to eliminate data anomalies and ensure data integrity by **breaking down large tables into smaller, related tables**. <u> I can say that my table Is correct when all column depend only on the primary key (there is no partial ( second form) and transitive ( third form ) dependency between columns) and (First form) there is no repeating group, multivalue and composite (seprate it into two columns or more) attribute  </u>.
 
  ****
- ## SQL
+ ## SQL language
 
 | DDL (Data Definition Lang) | DML (Data Manipulation lang) | DQL (Data Query lang) | TCL (Tansactionl Control Lang) | DCL (Data Control Lang) |
 | -------- | -------- | -------- | -------- | -------- |
@@ -1058,6 +1060,13 @@ AS
 BEGIN
     SELECT @NextOrderID = MAX(OrderID) + 1 FROM Orders;
 END;
+
+-- how to call it , you mast declare variable to save this output from the SP
+
+DECLARE @output INT; 
+execute GetNextOrderID @output OUTPUT
+select @output as outputt
+
 ```
 
 ### 3. **Input/Output Parameters:**
@@ -1220,9 +1229,9 @@ where fullname='ahmed ali '
 ## ACID
 ACID Is transaction proparity   
 -- **Atomicity**   All changes to data are performed as if they are a single operation. That is, all the changes are performed, or none of them are.    
--- **Consistency** constrain active, Data is in a consistent state when a transaction starts and when it ends    
--- **Isolation** - locks, The intermediate state of a transaction is invisible to other transactions. As a result, transactions that run concurrently appear to be serialized.  
--- **Durability** - rollback,   After a transaction successfully completes, changes to data persist and are not undone, even in the event of a system failure.  
+-- **Consistency**: **constrain active**, Data is in a consistent state when a transaction starts and when it ends    
+-- **Isolation**: - **locks**, The intermediate state of a transaction is invisible to other transactions. As a result, transactions that run concurrently appear to be serialized.  
+-- **Durability**: - **rollback**,   After a transaction successfully completes, changes to data persist and are not undone, even in the event of a system failure.  
 
 ```sql
 --try and catch  with transaction 

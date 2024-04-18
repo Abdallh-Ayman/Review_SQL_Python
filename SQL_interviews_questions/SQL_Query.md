@@ -206,8 +206,8 @@ HAVING COUNT(*) = 1;  -- Filter to include only unique values
 
 WITH CTE AS (
     SELECT ename,
-           COUNT(*) AS Frequency,                                  -- if we use any aggrigate we must use group by with other column without need to write the rownum(window function)
-           ROW_NUMBER() OVER (PARTITION BY ename ORDER BY (select null)) AS row_num
+           COUNT(*) AS Frequency,                                 
+           ROW_NUMBER() OVER (PARTITION BY ename ORDER BY (select null)) AS row_num    -- if we use any aggrigate we must use group by with other column without need to write the rownum(window function)
     FROM emp
     GROUP BY ename
 )
@@ -228,6 +228,50 @@ FROM CTE
 
 ```
 
+**Q22. Write a query to retrieve the unique values and hasn't been duplicated before .**
+
+```sql
+SELECT *
+FROM (
+    SELECT OrderID,
+           OrderDate,
+           CustomerID,
+           OrderTotal,
+           COUNT(*) OVER (PARTITION BY CustomerID) AS CustomerCount
+    FROM Orderss
+) AS tb1
+WHERE CustomerCount = 1;
+
+select 
+    CustomerID, count(*)
+from Orderss
+group by CustomerID
+having count(*) =1
+```
+
+```sql
+CREATE TABLE Orderss (
+    OrderID INT,
+    CustomerID INT,
+    OrderDate DATE,
+    OrderTotal DECIMAL(10, 2)
+);
+
+INSERT INTO Orderss (OrderID, CustomerID, OrderDate, OrderTotal)
+VALUES 
+    (1, 101, '2024-01-10', 150.00),
+    (2, 102, '2024-01-12', 200.00),
+    (3, 101, '2024-02-05', 300.00),
+    (4, 103, '2024-02-10', 250.00),
+    (5, 102, '2024-03-01', 180.00),
+    (6, 101, '2024-03-15', 350.00),
+    (7, 103, '2024-03-20', 350.00),
+	(8, 103, '2024-03-20', 400.00),
+	(9, 104, '2024-03-20', 500.00);
+```
+![alt text](image.png)
+
+------
 **Q23. Write a query to retrieve the list of employees working in the same department.**
 ```sql
 Select DISTINCT E.EmpID, E.EmpFname, E.Department 
