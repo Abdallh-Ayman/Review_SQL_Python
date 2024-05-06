@@ -7,11 +7,11 @@ import pandas as pd
 import numpy as np
 import time
 import sys
-# a = np.array(10)           #zero Dimensions
-# b = np.array([10, 20])     #one Dimensions
-# c = np.array([["A", "B", "X"], ["C", "D", "Y"], ["E", "F", "Z"], ["M", "N", "O"]])                        #two Dimensions
-# d = np.array( [ [ [5, 6], [7, 9] ], [ [1, 3], [4, 8] ] ] )  #three diemensions
-# print(d[1][1][-1])
+a = np.array(10)           #zero Dimensions
+b = np.array([10, 20])     #one Dimensions
+c = np.array([["A", "B", "X"], ["C", "D", "Y"], ["E", "F", "Z"], ["M", "N", "O"]])                        #two Dimensions
+d = np.array( [ [ [5, 6], [7, 9] ], [ [1, 3], [4, 8] ] ] )  #three diemensions
+print(d[1][1][-1])
 # print(d[1, 1, 1])
 # print(c[1])
 # print(c[2:, :2])       #2:=> it is rows :2=> it column

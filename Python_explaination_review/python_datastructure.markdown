@@ -1,3 +1,23 @@
+### for loop
+```python
+    For l in listt:
+    Pass
+```
+I >> represent loop iteration variable represent the element that the loop is currently processing  and it take its value from the iterable (listt)
+By default it convert iterable object to iterator to use next
+
+```python
+#For Loop Already Calls iter() Method on The Iterable(list, tuple , set, dictionary,string) Behind The Scene.
+words = {"python", "hangman", "programming", "challenge", "developer", "learning"}
+myiterator= iter(words)
+print(next(myiterator))
+print(next(myiterator))
+print(next(myiterator))
+print(next(myiterator))
+print(next(myiterator))
+print(next(myiterator))
+print(next(myiterator))  # it will print StopIteration 
+```
 # Data structure 
 ## list
 اما ordered ------mutable اقدر اوصل له عن طريق الindex ارقام... و متغير اقدر اغير اى عنصر زى الlist []  
@@ -326,7 +346,7 @@ filtered_dict = {k: v for k, v in my_dict.items() if v != 'value_to_remove'}  # 
 
 
 ```python 
-files= open("test.txt","a+")          if it doesn't exist it will create the file when you write or append
+files= open("test.txt","a+")         # if it doesn't exist it will create the file when you write or append
 print(files.read())
 print(files.write("omar"))
 files.close()
@@ -346,7 +366,7 @@ for pdf_file in pdf_files:
 ```
 ### jason
 Json : it coud be all object into on list or one object contain list of object.   
-1- To read a JSON file, you can use the json.load() function.This function reads a file-like object and returns the data. If you have a JSON string, you can parse it by using the json.loads() method. ( Json string parse to python object.)
+1- To read a JSON file, you can use the json.load() function.This function reads a file-like object and returns the data. If you have a JSON string, you can parse it by using the json.loads() method. ( Json string parse to python object(dictonary or list).)
 ```python
     Import json
     with open('data.json') as f :

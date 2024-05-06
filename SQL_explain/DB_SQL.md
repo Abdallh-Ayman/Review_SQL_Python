@@ -24,7 +24,8 @@
 - **Derived Attribute** it can be calculated based on another attribute like age ,it could be run on the runtime by making ispersisted (column property = no by default),or we can make it ispersisted=yes so he will save the calculated result in the hard disk.  
 isparse=yes:if you want to make the null don't take space on the desk. 
 - **Complex Attribute**
-![Alt text](image-2.png)
+![Alt text](image-2.png)  
+
 ![alt text](image-12.png)
 ![alt text](image-13.png)  
 
@@ -36,12 +37,29 @@ isparse=yes:if you want to make the null don't take space on the desk.
 **Mapping**:
 1-(total)1:1(total)   ![Alt text](image-3.png)  
 
-2-(partial)1:1(total) participation, if the partial increase the number of table increase  ![Alt text](image-4.png)  
-3-(partial)1:1(partial)         ![Alt text](image-5.png)  
-4-(partial)1:m(total) i look at the many primary key will be from the many ![Alt text](image-6.png)  
-5-(partial)1:m(partial)   ![Alt text](image-7.png)  
-6-m:m we put the shared attribute in the new table that contains the foriegn key  ![Alt text](image-9.png)  
-7-ternary m:m  ![Alt text](image-10.png)  
+2-(partial)1:1(total) participation, if the partial increase the number of table increase  
+
+![Alt text](image-4.png)  
+
+3-(partial)1:1(partial)       
+
+  ![Alt text](image-5.png)  
+4-(partial)1:m(total) i look at the many primary key will be from the many 
+
+![Alt text](image-6.png)  
+
+5-(partial)1:m(partial)   
+
+![Alt text](image-7.png)  
+
+6-m:m we put the shared attribute in the new table that contains the foriegn key 
+
+ ![Alt text](image-9.png)  
+
+7-ternary m:m  
+
+![Alt text](image-10.png)  
+
 **Candidate Key** A key is a column or set of columns in a table that uniquely identifies each row in that table. It helps in organizing and retrieving data efficiently. There can be multiple keys in a table, but typically, one of them is chosen as the primary key It is often the least number of columns of the keys and less data type.  
 
 **Primary Key**  is a special type of key in a relational database. It **uniquely identifies each record (row)** in a table and ensures that there are no duplicate values in the primary key column(s). 
@@ -354,7 +372,7 @@ WHERE last_name LIKE '%[aei]e%'                              -- '%b'  it gives n
 WHERE last_name LIKE '%[a-h]e%'                              --'%[aei]e%' search ae,ee,ie  --'%[a-h]e%' search all range
 WHERE last_name LIKE '%[^aei]e%'                                -- ^ it mean not will start with a or e or i
 WHERE last_name LIKE '%[^a-h]e%'   
-WHERE last_name LIKE '%[_]%'                                 -- it give Dina_abdallah
+WHERE last_name LIKE '%[_]%'                                 -- it give Dina_abdallah as the _mean single character by default so to make the sql understand it as _ we use []
 WHERE phone IS not NULL                                          -- we don't use = as null is not a value
 
 ORDER BY first_name asc                                                    --ترتيب تنازلى من الاكبر  للاصغر  
@@ -703,12 +721,12 @@ where EmpSalaryRank = 1
 
     | id | drink             | rk | Case_when | Cumulative |
     |----|-------------------|----|-------------------|-----|
-    | 1  | Daiquiri          | 1  | 1                 | 1   |
-    | 2  | NULL              | 2  | 0                 | 1   |
-    | 3  | Americano         | 3  | 1                 | 2   |
-    | 6  | NULL              | 4  | 0                 | 2   |
-    | 7  | NULL              | 5  | 0                 | 2   |
-    | 9  | Mezcal Margarita  | 6  | 1                 | 3   |
+    | 9  | Daiquiri          | 1  | 1                 | 1   |
+    | 6  | NULL              | 2  | 0                 | 1   |
+    | 7  | Americano         | 3  | 1                 | 2   |
+    | 3  | NULL              | 4  | 0                 | 2   |
+    | 1   | NULL             | 5  | 0                 | 2   |
+    | 2  | Mezcal Margarita  | 6  | 1                 | 3   |
 
     WITH S AS (
         SELECT *, ROW_NUMBER() OVER (ORDER BY id) AS rk
