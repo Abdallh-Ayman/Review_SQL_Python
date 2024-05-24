@@ -618,3 +618,639 @@ ORDER BY (SELECT NULL); -- The query you have written is used to select the firs
 SELECT TOP 1 *
 FROM YourTable
 ORDER BY (SELECT NULL) DESC;
+```
+
+---------
+## sql ideas
+
+### to get the rate of occurance of any element('confirmed') in any column (action) like this question , so in genral way if you want to get the aggregate of any element in specific column with condition you should use case when or iif inside the aggregate
+
+1- The confirmation rate of a user is the number of 'confirmed' messages divided by the total number of requested confirmation messages. The confirmation rate of a user that did not request any confirmation messages is 0. Round the confirmation rate to two decimal places.
+
+Write a solution to find the confirmation rate of each user.
+Return the result table in any order.
+The result format is in the following example.
+
+https://leetcode.com/problems/confirmation-rate/?envType=study-plan-v2&envId=top-sql-50 
+
+Input: 
+Signups table:
+
+| user_id | time_stamp          |
+|---------|---------------------|
+| 3       | 2020-03-21 10:16:13 |
+| 7       | 2020-01-04 13:57:59 |
+| 2       | 2020-07-29 23:09:44 |
+| 6       | 2020-12-09 10:39:37 |
+
+Confirmations table:
+
+| user_id | time_stamp          | action    |
+|---------|---------------------|-----------|
+| 3       | 2021-01-06 03:30:46 | timeout   |
+| 3       | 2021-07-14 14:00:00 | timeout   |
+| 7       | 2021-06-12 11:57:29 | confirmed |
+| 7       | 2021-06-13 12:58:28 | confirmed |
+| 7       | 2021-06-14 13:59:27 | confirmed |
+| 2       | 2021-01-22 00:00:00 | confirmed |
+| 2       | 2021-02-28 23:59:59 | timeout   |
+
+Output: 
+
+| user_id | confirmation_rate |
+|---------|-------------------|
+| 6       | 0.00              |
+| 3       | 0.00              |
+| 7       | 1.00              |
+| 2       | 0.50              |
+
+```sql
+/* Write your T-SQL query statement below */
+SELECT s.user_id,
+       ROUND(AVG(CASE WHEN c.action = 'confirmed' THEN 1.00 ELSE 0.00 END),2) AS confirmation_rate
+FROM Signups AS s
+LEFT JOIN Confirmations AS c
+ON s.user_id = c.user_id
+GROUP BY s.user_id
+```
+
+2- Write an SQL query to find for each month and country, the number of transactions and their total amount, the number of approved transactions and their total amount.
+Return the result table in any order.
+The query result format is in the following example.  
+
+https://leetcode.com/problems/monthly-transactions-i/?envType=study-plan-v2&envId=top-sql-50  
+
+Input: 
+Transactions table:
+| id   | country | state    | amount | trans_date |
+|------|---------|----------|--------|------------|
+| 121  | US      | approved | 1000   | 2018-12-18 |
+| 122  | US      | declined | 2000   | 2018-12-19 |
+| 123  | US      | approved | 2000   | 2019-01-01 |
+| 124  | DE      | approved | 2000   | 2019-01-07 |
+
+Output: 
+| month    | country | trans_count | approved_count | trans_total_amount | approved_total_amount |
+|----------|---------|-------------|----------------|--------------------|-----------------------|
+| 2018-12  | US      | 2           | 1              | 3000               | 1000                  |
+| 2019-01  | US      | 1           | 1              | 2000               | 2000                  |
+| 2019-01  | DE      | 1           | 1              | 2000               | 2000                  |
+
+```sql
+/* Write your T-SQL query statement below */
+SELECT
+    LEFT(CAST(trans_date AS  nvarchar), 7) AS month,
+    country,
+    COUNT(*) AS trans_count,
+    SUM(IIF(state = 'approved', 1, 0)) AS approved_count,
+    SUM(amount) AS trans_total_amount,
+    SUM(IIF(state = 'approved', amount, 0)) AS approved_total_amount
+
+FROM Transactions
+
+GROUP BY LEFT(CAST(trans_date AS  nvarchar), 7), country
+```
+
+--------
+
+### to get first element or second or any order of it use rank() in cte to get you table then filter on it down or   to get also the Nth of any element in specific group(partition) use windown function 
+ 
+https://leetcode.com/problems/immediate-food-delivery-ii/?envType=study-plan-v2&envId=top-sql-50  
+
+If the customer's preferred delivery date is the same as the order date, then the order is called immediate; otherwise, it is called scheduled.
+The first order of a customer is the order with the earliest order date that the customer made. It is guaranteed that a customer has precisely one first order.
+Write a solution to find the percentage of immediate orders in the first orders of all customers, rounded to 2 decimal places.
+The result format is in the following example.
+
+
+Input: 
+Delivery table:
+| delivery_id | customer_id | order_date | customer_pref_delivery_date |
+|-------------|-------------|------------|-----------------------------|
+| 1           | 1           | 2019-08-01 | 2019-08-02                  |
+| 2           | 2           | 2019-08-02 | 2019-08-02                  |
+| 3           | 1           | 2019-08-11 | 2019-08-12                  |
+| 4           | 3           | 2019-08-24 | 2019-08-24                  |
+| 5           | 3           | 2019-08-21 | 2019-08-22                  |
+| 6           | 2           | 2019-08-11 | 2019-08-13                  |
+| 7           | 4           | 2019-08-09 | 2019-08-09                  |
+
+Output: 
+| immediate_percentage |
+|----------------------|
+| 50.00                |
+
+Explanation: 
+The customer id 1 has a first order with delivery id 1 and it is scheduled.
+The customer id 2 has a first order with delivery id 2 and it is immediate.
+The customer id 3 has a first order with delivery id 5 and it is scheduled.
+The customer id 4 has a first order with delivery id 7 and it is immediate.
+Hence, half the customers have immediate first orders. 
+
+```sql
+ /* Write your T-SQL query statement below */
+WITH cte AS (
+    SELECT
+        customer_id,
+        order_date,
+        RANK() OVER (PARTITION BY customer_id ORDER BY order_date) AS r,  -- to get the first order for the customer 
+        customer_pref_delivery_date
+    FROM
+        Delivery
+)
+SELECT
+    ROUND(
+        CAST(100*COUNT(CASE WHEN order_date = customer_pref_delivery_date THEN 1 END) AS decimal) /
+        CAST(COUNT(customer_id) AS decimal),
+    2) AS immediate_percentage
+FROM
+    cte
+WHERE r = 1;
+```
+
+2-Display the highest payed employees in each department
+
+```sql
+WITH RankedSalaries AS (
+    SELECT
+        FirstName,
+        Salary,
+        DepartmentID,
+        ROW_NUMBER() OVER (PARTITION BY DepartmentID ORDER BY Salary DESC) AS SalaryRank
+    FROM Employee
+)
+SELECT
+    FirstName,
+    Salary,
+    DepartmentID
+FROM RankedSalaries
+WHERE SalaryRank = 1;
+```
+
+----
+
+### to compare between the value of element and the next value of it or the previous value use lag, lead
+
+Write a solution to find all dates' Id with higher temperatures compared to its previous dates (yesterday).
+Return the result table in any order.
+The result format is in the following example.
+
+https://leetcode.com/problems/rising-temperature/?envType=study-plan-v2&envId=top-sql-50
+
+
+Input: 
+Weather table:
+| id | recordDate | temperature |
+|----|------------|-------------|
+| 1  | 2015-01-01 | 10          |
+| 2  | 2015-01-02 | 25          |
+| 3  | 2015-01-03 | 20          |
+| 4  | 2015-01-04 | 30          |
+
+Output: 
+| id |
+|----|
+| 2  |
+| 4  |
+Explanation: 
+In 2015-01-02, the temperature was higher than the previous day (10 -> 25).  
+In 2015-01-04, the temperature was higher than the previous day (20 -> 30).
+
+
+```sql
+SELECT ID FROM (
+    SELECT ID,
+        Temperature,
+        recordDate ,
+        LAG(Temperature, 1) OVER (ORDER BY recordDate) AS prev_temp
+        ,lag(recordDate ,1) over (ORDER BY recordDate) as next_date
+    FROM weather
+) resultt
+WHERE  datediff(day, next_date,  recordDate)=1 and  Temperature >prev_temp ;
+```
+https://leetcode.com/problems/game-play-analysis-iv/description/?envType=study-plan-v2&envId=top-sql-50  
+
+Write a solution to report the fraction of players that logged in again on the day after the day they first logged in, rounded to 2 decimal places. In other words, you need to count the number of players that logged in for at least two consecutive days starting from their first login date, then divide that number by the total number of players.
+The result format is in the following example.
+
+ 
+Input: 
+Activity table:
+| player_id | device_id | event_date | games_played |
+|-----------|-----------|------------|--------------|
+| 1         | 2         | 2016-03-01 | 5            |
+| 1         | 2         | 2016-03-02 | 6            |
+| 2         | 3         | 2017-06-25 | 1            |
+| 3         | 1         | 2016-03-02 | 0            |
+| 3         | 4         | 2018-07-03 | 5            |
+Output: 
+
+| fraction  |
+|-----------|
+| 0.33      |
+
+Explanation: 
+Only the player with id 1 logged back in after the first day he had logged in so the answer is 1/3 = 0.33
+```sql
+WITH ConsecutiveNumbers AS (
+    SELECT
+		player_id,
+        event_date,
+        LEAD(event_date, 1) OVER (partition by player_id ORDER BY player_id ) AS next_number
+    FROM activity
+)
+
+SELECT  round(count(distinct player_id )/(select  Count( distinct player_id)*1.0 from Activity),2) as fraction
+FROM ConsecutiveNumbers
+WHERE datediff(day,event_date,next_number) = 1
+```
+----
+
+### to use the condition in the same table and we have only one table you should use self join 
+
+The time to complete a process is the 'end' timestamp minus the 'start' timestamp. The average time is calculated by the total time to complete every process on the machine divided by the number of processes that were run.
+The resulting table should have the machine_id along with the average time as processing_time, which should be rounded to 3 decimal places.
+Return the result table in any order.
+The result format is in the following example.
+
+https://leetcode.com/problems/average-time-of-process-per-machine/description/?envType=study-plan-v2&envId=top-sql-50
+
+Input: 
+Activity table:
+
+| machine_id | process_id | activity_type | timestamp |
+|------------|------------|---------------|-----------|
+| 0          | 0          | start         | 0.712     |
+| 0          | 0          | end           | 1.520     |
+| 0          | 1          | start         | 3.140     |
+| 0          | 1          | end           | 4.120     |
+| 1          | 0          | start         | 0.550     |
+| 1          | 0          | end           | 1.550     |
+| 1          | 1          | start         | 0.430     |
+| 1          | 1          | end           | 1.420     |
+| 2          | 0          | start         | 4.100     |
+| 2          | 0          | end           | 4.512     |
+| 2          | 1          | start         | 2.500     |
+| 2          | 1          | end           | 5.000     |
+
+Output: 
+
+| machine_id | processing_time |
+|------------|-----------------|
+| 0          | 0.894           |
+| 1          | 0.995           |
+| 2          | 1.456           |
+
+Explanation: 
+There are 3 machines running 2 processes each.
+Machine 0's average time is ((1.520 - 0.712) + (4.120 - 3.140)) / 2 = 0.894
+Machine 1's average time is ((1.550 - 0.550) + (1.420 - 0.430)) / 2 = 0.995
+Machine 2's average time is ((4.512 - 4.100) + (5.000 - 2.500)) / 2 = 1.456
+
+```sql 
+/* Write your T-SQL query statement below */
+select a.machine_id,
+round(avg(b.timestamp - a.timestamp),3) as processing_time
+from activity a, activity b
+where a.machine_id = b.machine_id
+and a.process_id = b.process_id
+and a.activity_type = 'start'
+and b.activity_type = 'end'
+group by a.machine_id
+```
+
+2- Write a solution to find managers with at least five direct reports.
+Return the result table in any order.
+The result format is in the following example.
+
+https://leetcode.com/problems/managers-with-at-least-5-direct-reports/?envType=study-plan-v2&envId=top-sql-50
+
+Input: 
+Employee table:
+| id  | name  | department | managerId |
+|-----|-------|------------|-----------|
+| 101 | John  | A          | null      |
+| 102 | Dan   | A          | 101       |
+| 103 | James | A          | 101       |
+| 104 | Amy   | A          | 101       |
+| 105 | Anne  | A          | 101       |
+| 106 | Ron   | B          | 101       |
+
+Output: 
+
+| name |
+|------|
+| John |
+
+
+```sql
+SELECT ma.name
+FROM Employee em
+INNER JOIN Employee ma
+ON ma.id = em.managerid
+GROUP BY ma.name, ma.id
+HAVING COUNT(em.id)>=5
+```
+3- 579. Find Cumulative Salary of an Employee : Write a SQL to get the cumulative sum of an employee's salary over a period of 3 months but exclude the most recent month.
+The result should be displayed by 'Id' ascending, and then by 'Month' descending.
+
+Input
+
+| Id | Month | Salary |
+|----|-------|--------|
+| 1  | 1     | 20     |
+| 2  | 1     | 20     |
+| 1  | 2     | 30     |
+| 2  | 2     | 30     |
+| 3  | 2     | 40     |
+| 1  | 3     | 40     |
+| 3  | 3     | 60     |
+| 1  | 4     | 60     |
+| 3  | 4     | 70     |
+Output
+
+| Id | Month | Salary |
+|----|-------|--------|
+| 1  | 3     | 90     |
+| 1  | 2     | 50     |
+| 1  | 1     | 20     |
+| 2  | 1     | 20     |
+| 3  | 3     | 100    |
+| 3  | 2     | 40     |
+ 
+
+Explanation
+Employee '1' has 3 salary records for the following 3 months except the most recent month '4': salary 40 for month '3', 30 for month '2' and 20 for month '1'
+So the cumulative sum of salary of this employee over 3 months is 90(40+30+20), 50(30+20) and 20 respectively.
+
+| Id | Month | Salary |
+|----|-------|--------|
+| 1  | 3     | 90     |
+| 1  | 2     | 50     |
+| 1  | 1     | 20     |
+Employee '2' only has one salary record (month '1') except its most recent month '2'.
+| Id | Month | Salary |
+|----|-------|--------|
+| 2  | 1     | 20     |
+ 
+
+Employ '3' has two salary records except its most recent pay month '4': month '3' with 60 and month '2' with 40. So the cumulative salary is as following.
+| Id | Month | Salary |
+|----|-------|--------|
+| 3  | 3     | 100    |
+| 3  | 2     | 40     |
+
+```sql
+select e.id, e1.month,sum(e2.salary) Salary
+from Employee e
+join Employee e2
+on e1.id = e2.id and e.month >= e2.month and (e.month - e2.month <= 2)
+where e.month < (select max(month) from Employee where id = e.id) group by e.Id, e.month
+order by 1, 2 desc;
+
+--or 
+with cte1 as 
+(
+SELECT 
+    Id,
+    Month,
+    SUM(Salary) OVER (PARTITION BY Id ORDER BY Month) AS Salary
+	,LAST_VALUE(Month) OVER (PARTITION BY Id order by(select null) ) lsalary
+FROM YourTable
+)
+select id, month , salary
+from cte1
+where Month < lsalary
+order by id , month desc
+```
+
+---
+### cross join
+
+Write a solution to find the number of times each student attended each exam.
+Return the result table ordered by student_id and subject_name.
+The result format is in the following example.
+
+
+Input: 
+Students table:
+
+| student_id | student_name |
+|------------|--------------|
+| 1          | Alice        |
+| 2          | Bob          |
+| 13         | John         |
+| 6          | Alex         |
+Subjects table:
+
+| subject_name |
+|--------------|
+| Math         |
+| Physics      |
+| Programming  |
+
+Examinations table:
+
+| student_id | subject_name |
+|------------|--------------|
+| 1          | Math         |
+| 1          | Physics      |
+| 1          | Programming  |
+| 2          | Programming  |
+| 1          | Physics      |
+| 1          | Math         |
+| 13         | Math         |
+| 13         | Programming  |
+| 13         | Physics      |
+| 2          | Math         |
+| 1          | Math         |
+
+Output: 
+
+| student_id | student_name | subject_name | attended_exams |
+|------------|--------------|--------------|----------------|
+| 1          | Alice        | Math         | 3              |
+| 1          | Alice        | Physics      | 2              |
+| 1          | Alice        | Programming  | 1              |
+| 2          | Bob          | Math         | 1              |
+| 2          | Bob          | Physics      | 0              |
+| 2          | Bob          | Programming  | 1              |
+| 6          | Alex         | Math         | 0              |
+| 6          | Alex         | Physics      | 0              |
+| 6          | Alex         | Programming  | 0              |
+| 13         | John         | Math         | 1              |
+| 13         | John         | Physics      | 1              |
+| 13         | John         | Programming  | 1              |
+
+Explanation: 
+The result table should contain all students and all subjects.
+Alice attended the Math exam 3 times, the Physics exam 2 times, and the Programming exam 1 time.
+Bob attended the Math exam 1 time, the Programming exam 1 time, and did not attend the Physics exam.
+Alex did not attend any exams.
+John attended the Math exam 1 time, the Physics exam 1 time, and the Programming exam 1 time.
+
+```sql
+/* Write your T-SQL query statement below */
+WITH subject_cte AS(
+    SELECT student_id,
+        s.student_name,
+        sb.subject_name
+    FROM Students s
+    CROSS JOIN Subjects sb
+)
+SELECT s.student_id, 
+    s.student_name,
+    s.subject_name,
+    count(e.student_id) attended_exams
+FROM subject_cte s 
+LEFT JOIN Examinations e ON s.student_id = e.student_id AND s.subject_name = e.subject_name
+GROUP BY s.student_id, 
+    s.student_name,
+    s.subject_name
+ORDER BY 1,3
+```
+
+---
+### median 
+
+569. Median Employee Salary
+The Employee table holds all employees. The employee table has three columns: Employee Id, Company Name, and Salary.
+
++-----+------------+--------+
+|Id   | Company    | Salary |
++-----+------------+--------+
+|1    | A          | 2341   |
+|2    | A          | 341    |
+|3    | A          | 15     |
+|4    | A          | 15314  |
+|5    | A          | 451    |
+|6    | A          | 513    |
+|7    | B          | 15     |
+|8    | B          | 13     |
+|9    | B          | 1154   |
+|10   | B          | 1345   |
+|11   | B          | 1221   |
+|12   | B          | 234    |
+|13   | C          | 2345   |
+|14   | C          | 2645   |
+|15   | C          | 2645   |
+|16   | C          | 2652   |
+|17   | C          | 65     |
++-----+------------+--------+
+Write a SQL query to find the median salary of each company. Bonus points if you can solve it without using any built-in SQL functions.
+
++-----+------------+--------+
+|Id   | Company    | Salary |
++-----+------------+--------+
+|5    | A          | 451    |
+|6    | A          | 513    |
+|12   | B          | 234    |
+|9    | B          | 1154   |
+|14   | C          | 2645   |
++-----+------------+--------+
+
+```sql
+WITH OrderedData AS (
+    SELECT Company, Salary,
+    ROW_NUMBER() OVER (PARTITION BY Company ORDER BY Salary asc,Id asc) AS RowAsc,
+   ROW_NUMBER() OVER (PARTITION BY Company ORDER BY Salary DESC,id DESC) AS RowDesc
+    FROM employee
+)
+SELECT *
+FROM OrderedData
+WHERE RowAsc = RowDesc OR RowAsc + 1 = RowDesc OR RowAsc = RowDesc + 1 
+
+--or
+where RowAsc IN (RowDesc, RowDesc - 1, RowDesc + 1)
+
+```
+
+----
+
+The cancellation rate is computed by dividing the number of canceled (by client or driver) requests with unbanned users by the total number of requests with unbanned users on that day.
+Write a solution to find the cancellation rate of requests with unbanned users (both client and driver must not be banned) each day between "2013-10-01" and "2013-10-03". Round Cancellation Rate to two decimal points.
+Return the result table in any order.
+The result format is in the following example.
+
+https://leetcode.com/problems/trips-and-users/
+
+
+Input: 
+Trips table:
+
+| id | client_id | driver_id | city_id | status              | request_at |
+|----|-----------|-----------|---------|---------------------|------------|
+| 1  | 1         | 10        | 1       | completed           | 2013-10-01 |
+| 2  | 2         | 11        | 1       | cancelled_by_driver | 2013-10-01 |
+| 3  | 3         | 12        | 6       | completed           | 2013-10-01 |
+| 4  | 4         | 13        | 6       | cancelled_by_client | 2013-10-01 |
+| 5  | 1         | 10        | 1       | completed           | 2013-10-02 |
+| 6  | 2         | 11        | 6       | completed           | 2013-10-02 |
+| 7  | 3         | 12        | 6       | completed           | 2013-10-02 |
+| 8  | 2         | 12        | 12      | completed           | 2013-10-03 |
+| 9  | 3         | 10        | 12      | completed           | 2013-10-03 |
+| 10 | 4         | 13        | 12      | cancelled_by_driver | 2013-10-03 |
+
+Users table:
+
+| users_id | banned | role   |
+|----------|--------|--------|
+| 1        | No     | client |
+| 2        | Yes    | client |
+| 3        | No     | client |
+| 4        | No     | client |
+| 10       | No     | driver |
+| 11       | No     | driver |
+| 12       | No     | driver |
+| 13       | No     | driver |
+
+Output: 
+
+| Day        | Cancellation Rate |
+|------------|-------------------|
+| 2013-10-01 | 0.33              |
+| 2013-10-02 | 0.00              |
+| 2013-10-03 | 0.50              |
+
+Explanation: 
+On 2013-10-01:
+  - There were 4 requests in total, 2 of which were canceled.
+  - However, the request with Id=2 was made by a banned client (User_Id=2), so it is ignored in the calculation.
+  - Hence there are 3 unbanned requests in total, 1 of which was canceled.
+  - The Cancellation Rate is (1 / 3) = 0.33
+On 2013-10-02:
+  - There were 3 requests in total, 0 of which were canceled.
+  - The request with Id=6 was made by a banned client, so it is ignored.
+  - Hence there are 2 unbanned requests in total, 0 of which were canceled.
+  - The Cancellation Rate is (0 / 2) = 0.00
+On 2013-10-03:
+  - There were 3 requests in total, 1 of which was canceled.
+  - The request with Id=8 was made by a banned client, so it is ignored.
+  - Hence there are 2 unbanned request in total, 1 of which were canceled.
+  - The Cancellation Rate is (1 / 2) = 0.50
+
+
+```sql
+WITH not_banned as (
+    SELECT users_id FROM users
+    WHERE banned = 'No'
+) 
+SELECT
+    request_at as Day,
+    ROUND( SUM( CASE WHEN status LIKE 'cancelled%'
+                     THEN 1.00
+                     ELSE 0 END) / COUNT(*), 2)
+    AS "Cancellation Rate"
+FROM Trips
+WHERE
+    client_id IN (SELECT users_id FROM not_banned)
+    AND driver_id IN (SELECT users_id FROM not_banned)
+    AND request_at BETWEEN '2013-10-01' AND '2013-10-03'
+GROUP BY request_at
+```
+
+----
+
+
+
+

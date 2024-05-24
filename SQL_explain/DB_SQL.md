@@ -470,7 +470,7 @@ order by cte.total_challenge desc,hacker_id
 ```
 
 ---
-<img src="join.png" width='650px' hight='650px' >    
+<img src="join.png" width='650px' hight='650px' >  ![alt text](image-14.png)
 
 - **join**  
 **Inner Join**: Returns only the rows where there is a match in both tables.  
@@ -602,6 +602,106 @@ FROM
 WHERE F_SAL > S_SAL
 ORDER BY F_SAL
 ``` 
+
+
+Write a solution to find the number of times each student attended each exam. Return the result table ordered by student_id and subject_name. The result format is in the following example.
+
+https://leetcode.com/problems/students-and-examinations/description/?envType=study-plan-v2&envId=top-sql-50
+
+Input: 
+Students table:  
+
+
+| student_id | student_name |  
+|------------|--------------|  
+| 1          | Alice        |  
+| 2          | Bob          |  
+| 13         | John         |  
+| 6          | Alex         |  
+
+
+Subjects table:  
+ 
+| subject_name |  
+|--------------|  
+| Math         |  
+| Physics      |
+| Programming  |  
+ 
+
+Examinations table:  
+
+| student_id | subject_name |  
+|------------|--------------| 
+| 1          | Math         |  
+| 1          | Physics      |  
+| 1          | Programming  |  
+| 2          | Programming  |  
+| 1          | Physics      |  
+| 1          | Math         |  
+| 13         | Math         |  
+| 13         | Programming  |  
+| 13         | Physics      |  
+| 2          | Math         |  
+| 1          | Math         |  
+ 
+
+Output:   
+
+ 
+| student_id | student_name | subject_name | attended_exams |  
+|------------|--------------|--------------|----------------| 
+| 1          | Alice        | Math         | 3              |
+| 1          | Alice        | Physics      | 2              |  
+| 1          | Alice        | Programming  | 1              |  
+| 2          | Bob          | Math         | 1              |
+| 2          | Bob          | Physics      | 0              |  
+| 2          | Bob          | Programming  | 1              |  
+| 6          | Alex         | Math         | 0              |  
+| 6          | Alex         | Physics      | 0              |  
+| 6          | Alex         | Programming  | 0              |  
+| 13         | John         | Math         | 1              |  
+| 13         | John         | Physics      | 1              |  
+| 13         | John         | Programming  | 1              |  
+ 
+
+Explanation: 
+The result table should contain all students and all subjects.
+Alice attended the Math exam 3 times, the Physics exam 2 times, and the Programming exam 1 time.
+Bob attended the Math exam 1 time, the Programming exam 1 time, and did not attend the Physics exam.
+Alex did not attend any exams.
+John attended the Math exam 1 time, the Physics exam 1 time, and the Programming exam 1 time.
+
+```sql 
+-- count >> it only count the values not null so if it is null it will return 0
+SELECT s.student_id, s.student_name, sub.subject_name, COUNT(e.student_id) AS attended_exams
+FROM Students AS s
+CROSS JOIN Subjects AS sub
+LEFT JOIN Examinations AS e ON s.student_id = e.student_id AND sub.subject_name = e.subject_name
+GROUP BY s.student_id, s.student_name, sub.subject_name
+ORDER BY s.student_id, sub.subject_name;
+
+--OR 
+WITH subject_cte AS(
+    SELECT student_id,
+        s.student_name,
+        sb.subject_name
+    FROM Students s
+    CROSS JOIN Subjects sb
+)
+SELECT s.student_id, 
+    s.student_name,
+    s.subject_name,
+    count(e.student_id) attended_exams
+FROM subject_cte s 
+LEFT JOIN Examinations e ON s.student_id = e.student_id AND s.subject_name = e.subject_name
+GROUP BY s.student_id, 
+    s.student_name,
+    s.subject_name
+ORDER BY 1,3
+
+
+```
 - **UNION**
 The SELECT statements must have **the same number of columns**, and the corresponding columns in each SELECT statement must have **compatible data types**.  
 UNION and UNION ALL are useful operators in SQL Server for combining the results of two or more SELECT statements into a single result set, with the main difference being that UNION removes duplicates and also sorts data while UNION ALL does not.
@@ -648,7 +748,7 @@ FROM products;
 | Multi-row subquery | Returns multiple rows of results. And single column | SELECT column1, column2 FROM main_table WHERE column3 IN (SELECT column3 FROM sub_table WHERE condition);|
 | Multiple column subquery | This type of subquery returns one or more rows and one or more columns. to use > or > we should use any or all and to know the equalitly use IN | SELECT column1, column2 FROM main_table WHERE column3 IN (SELECT sub_column FROM sub_table WHERE condition);<br> SELECT column1, column2 FROM main_table WHERE column3 > ANY (SELECT sub_column FROM sub_table WHERE condition); <br> SELECT column1, column2 FROM main_table WHERE column3 > ALL (SELECT sub_column FROM sub_table WHERE condition); |
 | **Correlated subquery** (CROSS join APPLY) | Evaluated once for each row of the outer query. | SELECT * FROM employees WHERE salary > (SELECT salary FROM employees WHERE manager_id = employee_id) |
-| Nested subquery | A subquery that is nested inside another subquery | SELECT * FROM employees WHERE salary > (SELECT MAX(salary) FROM employees WHERE department_id = 'HR')
+
 
 This subquery checks if there are any rows in the "Projects" table where the End_Date matches the Start_Date of the outer query's current row (P1.Start_Date). This subquery will be evaluated for each row in the outer query's result set. **Not exists** return true If there's no row in the subquery result so it return start date that isn't in end date.
 
@@ -1512,13 +1612,21 @@ In summary, table statistics are a crucial part of the database's optimization p
 4. **Use JOINs Carefully:**
    - Ensure that JOIN conditions are efficient. Use INNER JOIN, LEFT JOIN, or RIGHT JOIN appropriately.
    - Avoid Cartesian products by specifying proper JOIN conditions.
-
    ```sql
    SELECT *
    FROM table1
    INNER JOIN table2 ON table1.id = table2.id;
    ```
+   -  In Query 1, the filter e.salary = 1000 is part of the join condition, potentially reducing the number of rows considered in the join operation itself. In Query 2, the filter is applied after the join, which means the join is performed on all rows that meet the join condition, and then the result is filtered by e.salary = 1000.
+    - If there is an index on e.salary, Query 2 might better leverage this index after performing the join.  Query 1 might not fully utilize the index on e.salary during the join process because the join condition is more complex.
+    - SQL Server’s optimizer might still find it more efficient to evaluate the join first and then apply the filter in Query 2. Without indexes, the filtering step might not have a significant performance difference, but Query 2 maintains a clearer logical separation of join and filtering operations.
+   ```sql
+   --query 1 and
+   select * from Employee e  join Department d on d.dept_id=e.dept_id and e.salary=1000
+    --query 2 where
+    select * from Employee e  join Department d on d.dept_id=e.dept_id where e.salary=1000
 
+```
 5. **Limit the Result Set: and avoide use select distinct**
    - Use `TOP` or `LIMIT` clauses to limit the number of rows returned, especially if you don't need all rows. and avoide use select distinct
 
