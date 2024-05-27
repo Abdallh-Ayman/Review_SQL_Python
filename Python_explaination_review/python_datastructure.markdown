@@ -184,7 +184,7 @@ nested_tuple = ((1, 2), (3, 4), (5, 6))
 flattened_tuple = tuple(item for sublist in nested_tuple for item in sublist)  # Flattening Nested Tuples
 a, *rest = my_tuple                        # Tuple Unpacking with Asterisk
 list_of_tuples = [(1, 2), (3, 4), (5, 6)]
-tuple_of_lists = tuple(zip(*list_of_tuples))  # Converting List of Tuples to Tuple of Lists
+tuple_of_lists = tuple(zip(*list_of_tuples))  # Converting List of Tuples to Tuple of Lists output >>> ((1, 3, 5), (2, 4, 6))
 
 for index, value in enumerate(my_tuple):  # Enumerating Tuples
     print(index, value)
