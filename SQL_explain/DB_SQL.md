@@ -1,64 +1,4 @@
-## Data Base
-- **DB** is place to store and manage data in structured table with relationship with each other.
-- **DBMS** (Database Management System) - software that manages the database, provides access control, transaction management, etc.
-- **DB system** The DBMS software together with the data itself.the applications are also included. ( Software or dashboards + Database ). because the normal user can't deal with data base only the developer
-- **schema**: is a named container for database objects. A schema can include tables, views, functions, stored procedures, and other database objects.The dbo schema is the default schema and is used to store objects that don't belong to a specific schema.
-- **file system in sql server**:is consist of two files 1-mdf:it contains row data with its metadata(data about data) 2-ldf: log file contains all the transaction that i make on the ssms
 
-******
-## DB Design
-- **DATA Modeling**: refer to how to organize data in database into tables and how to relate those tables if we want to join them.
-- **ERD** : It is a <span style="background-color: green;">**visual representation**</span> used in database design to describe the logical structure of a database system Through converting **req document** needed from the customer into ERD. An ERD **illustrates the relationships between various entities (objects, concepts, or things) within a system and how they interact with each other**. Then we make <span style="background-color: green;">mapping</span> to convert it to actual schema table in our data base.  
-
-**Entity type**
-- **strong entity** : an Entity set that has a primary key.we can't say that the entity is a table as if there is entity with Multivalued Attribute it will be mapped as two tables.  
-
-- **Weak entity**: An entity set that do not have sufficient attributes to form a primary key so it have partial key.it always be total Participation. تانيه يعنى لو عندى طفل لو مسحت الاب بتاعه مش هيبقى له معنى entity بيعتمد وجوده على  ( employ = his_family)
-
-![Alt text](image-1.png)
-
-**attributes type**
-- **Simple Attribute**
-- **Composite Attribute** only i can say that composite if we add columns with each other it give me meaning like adress atrribute that have street and city  
-- **Multi-valued Attribute** if we add columns with each other it didn't give me meaning like phone that have ph1 and ph2
-- **Derived Attribute** it can be calculated based on another attribute like age ,it could be run on the runtime by making ispersisted (column property = no by default),or we can make it ispersisted=yes so he will save the calculated result in the hard disk.  
-isparse=yes:if you want to make the null don't take space on the desk. 
-- **Complex Attribute**
-![Alt text](image-2.png)  
-
-![alt text](image-12.png)
-![alt text](image-13.png)  
-
-**relationship type**
-- **degree** : unary(recursive,self join) , binary(two entity) , ternary(three entity or more) 
-- **Cardinality** : التانيهentity مسكت صف واحد تشوف المدى بتاعه فى ( 1:1 , 1:M  M:M)    
-- **Participation** : هل كل الصفوف داخله معانا فى العلاقه ولا لا . forien key allow null it make the relation partial participation , and if forien key don't allow null it make the relation total participation.
-
-**Mapping**:
-1-(total)1:1(total)   ![Alt text](image-3.png)  
-
-2-(partial)1:1(total) participation, if the partial increase the number of table increase  
-
-![Alt text](image-4.png)  
-
-3-(partial)1:1(partial)       
-
-  ![Alt text](image-5.png)  
-4-(partial)1:m(total) i look at the many primary key will be from the many 
-
-![Alt text](image-6.png)  
-
-5-(partial)1:m(partial)   
-
-![Alt text](image-7.png)  
-
-6-m:m we put the shared attribute in the new table that contains the foriegn key 
-
- ![Alt text](image-9.png)  
-
-7-ternary m:m  
-
-![Alt text](image-10.png)  
 
 **Candidate Key** A key is a column or set of columns in a table that uniquely identifies each row in that table. It helps in organizing and retrieving data efficiently. There can be multiple keys in a table, but typically, one of them is chosen as the primary key It is often the least number of columns of the keys and less data type.  
 
@@ -123,11 +63,7 @@ SET ProductID = 4
 WHERE ProductID = 1;
 ```  
 *****
-## Normalization
-- we use **Normalization** If we want to improve Data base system that already exist but we will use **ERD** if the data base system does not exist.  
- **Normalization** Normalization is a process used to organize and structure data within a database to **minimize redundancy and dependency issues**. The goal of normalization is to eliminate data anomalies and ensure data integrity by **breaking down large tables into smaller, related tables**. <u> I can say that my table Is correct when all column depend only on the primary key (there is no partial ( second form) and transitive ( third form ) dependency between columns) and (First form) there is no repeating group, multivalue and composite (seprate it into two columns or more) attribute  </u>.
 
- ****
  ## SQL language
 
 | DDL (Data Definition Lang) | DML (Data Manipulation lang) | DQL (Data Query lang) | TCL (Tansactionl Control Lang) | DCL (Data Control Lang) |
@@ -1625,8 +1561,9 @@ In summary, table statistics are a crucial part of the database's optimization p
    select * from Employee e  join Department d on d.dept_id=e.dept_id and e.salary=1000
     --query 2 where
     select * from Employee e  join Department d on d.dept_id=e.dept_id where e.salary=1000
+    ```
 
-```
+
 5. **Limit the Result Set: and avoide use select distinct**
    - Use `TOP` or `LIMIT` clauses to limit the number of rows returned, especially if you don't need all rows. and avoide use select distinct
 
@@ -1663,7 +1600,7 @@ In summary, table statistics are a crucial part of the database's optimization p
    - avoid subquery and use joins , CTE Or Temp table instead of that
 
 11. **avoid using multiple OR Condition**
-   - instead of using multiple OR use IN operator or union all
+   - instead of using multiple OR(logical operator ) use IN(multirow operator) operator or union all
    ```sql
     -- don't use this
       WHERE state 'VA' OR 'GA'OR  'FL' 
