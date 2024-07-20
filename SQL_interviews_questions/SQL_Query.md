@@ -196,6 +196,8 @@ WHERE (employee_name) NOT IN (
 ![alt text](duplicated.jpg)
 
 ```sql
+-- you should group by or PARTITION BY the column that you wnat to remover the duplicated value or show it from this column  
+
 SELECT ename, COUNT(*) AS Frequency
 FROM emp
 GROUP BY ename
@@ -1286,6 +1288,16 @@ INSERT INTO Submissions (submission_date, submission_id, hacker_id, score) VALUE
 ('2016-03-05', 82439, 36396, 10),
 ('2016-03-05', 90006, 36396, 40),
 ('2016-03-06', 90404, 20703, 0);
+
+Sample Output
+
+2016-03-01 4 20703 Angela
+2016-03-02 2 79722 Michael
+2016-03-03 2 20703 Angela
+2016-03-04 2 20703 Angela
+2016-03-05 1 36396 Frank
+2016-03-06 1 20703 Angela
+
 
 --solotion 
 
