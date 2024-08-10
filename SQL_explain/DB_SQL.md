@@ -793,7 +793,7 @@ where EmpSalaryRank = 1
         - The row after it (1 FOLLOWING)
     ```sql 
     SELECT 
-    AVG(sales) OVER (ORDER BY sale_date ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS moving_average
+    AVG(sales) OVER (ORDER BY sale_date ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS moving_average  --You can say that sum(saies) over(order by year_order,month_order_date rows between 2 preceding and current row) as cumulative_saies
     FROM sales;
     ```
     |sale_date|	sales |	moving_average|

@@ -192,33 +192,20 @@ WHERE (employee_name) NOT IN (
 - **group by** may be faster than window functions, especially if you only want to perform a **single calculation**(average, maximum, or count.) on each group of rows 
 - **use window function** :If there are **many distinct groups** in your dataset and only a few duplicates within each group,This is because window functions operate on a per-row basis and don't require grouping the entire dataset. 
 - **use GROUP BY**: if there are **few distinct groups** with a significant number of duplicates within each group, as it aggregates the data based on the grouped column directly.
-
+- if you want to see the **duplicated values** you should use **window function** but if you want to see the **uniqe value** you should use **group by**
 ![alt text](duplicated.jpg)
 
 ```sql
 -- you should group by or PARTITION BY the column that you wnat to remover the duplicated value or show it from this column  
-
+--using group by 
 SELECT ename, COUNT(*) AS Frequency
 FROM emp
 GROUP BY ename
 HAVING COUNT(*) > 1; -- Filter to include only duplicated values
 HAVING COUNT(*) = 1;  -- Filter to include only unique values
 
--- using ROW_NUMBER() 
-
-WITH CTE AS (
-    SELECT ename,
-           COUNT(*) AS Frequency,                                 
-           ROW_NUMBER() OVER (PARTITION BY ename ORDER BY (select null)) AS row_num    -- if we use any aggrigate we must use group by with other column without need to write the rownum(window function)
-    FROM emp
-    GROUP BY ename
-)
-SELECT ename, Frequency
-FROM CTE
-WHERE Frequency > 1
-ORDER BY Frequency DESC;
-
--- if you want to see the duplicated value only without considering frequency:
+--using window function 
+-- if you want to see the duplicated values you should use window function but if you want to see the uniqe value you should use group by:
 WITH CTE AS (
     SELECT ename,
 			eadress,       
@@ -227,7 +214,7 @@ WITH CTE AS (
 )
 SELECT ename, eadress, row_num
 FROM CTE
-
+WHERE row_num > 1 ; -- can't filter on row_num = 1 >> as it will give all distinct value not unique  
 ```
 
 **Q22. Write a query to retrieve the unique values and hasn't been duplicated before .**
@@ -1118,9 +1105,9 @@ ORDER BY 1,3
 569. Median Employee Salary
 The Employee table holds all employees. The employee table has three columns: Employee Id, Company Name, and Salary.
 
-+-----+------------+--------+
+
 |Id   | Company    | Salary |
-+-----+------------+--------+
+|-----|------------|--------|
 |1    | A          | 2341   |
 |2    | A          | 341    |
 |3    | A          | 15     |
@@ -1138,18 +1125,18 @@ The Employee table holds all employees. The employee table has three columns: Em
 |15   | C          | 2645   |
 |16   | C          | 2652   |
 |17   | C          | 65     |
-+-----+------------+--------+
+
 Write a SQL query to find the median salary of each company. Bonus points if you can solve it without using any built-in SQL functions.
 
-+-----+------------+--------+
+|-----|------------|--------|
 |Id   | Company    | Salary |
-+-----+------------+--------+
+|-----|------------|--------|
 |5    | A          | 451    |
 |6    | A          | 513    |
 |12   | B          | 234    |
 |9    | B          | 1154   |
 |14   | C          | 2645   |
-+-----+------------+--------+
+
 
 ```sql
 WITH OrderedData AS (
@@ -1253,8 +1240,8 @@ GROUP BY request_at
 
 ------
 
-https://www.hackerrank.com/challenges/15-days-of-learning-sql/problem
-
+https://www.hackerrank.com/challenges/15-days-of-learning-sql/problem  
+https://www.youtube.com/watch?v=zrCIWGHnLao  
 Julia conducted a  days of learning SQL contest. The start date of the contest was March 01, 2016 and the end date was March 15, 2016.
 Write a query to print total number of unique hackers who made at least  submission each day (starting on the first day of the contest), and find the hacker_id and name of the hacker who made maximum number of submissions each day. If more than one such hacker has a maximum number of submissions, print the lowest hacker_id. The query should print this information for each day of the contest, sorted by the date.
 
@@ -1303,20 +1290,20 @@ Sample Output
 
 with cte as(
 select submission_date, hacker id , count(*) no_of_submissions
-,dense RANK() over(order by submission_date) as day_number
+,dense_RANK() over(order by submission_date) as day_number
 from Submissions
 group by submission_date, hacker_id
 )
 ,cte2 as(
 select *,
-count(*) over(partition by hacker_id order by submission_date) as till_date_submissions
+count(*) over(partition by hacker_id order by submission_date) as till_date_submissions,
 case when day_number=count(*) over(partition by hacker_id order by submission_date) then 1 else 0 end as unique_flag
 from cte
 )
 ,cte3 as(
 select * 
 sum (unique_flag) over(partition by submission_date) as unique_count
-, ROW NUMBER() over(partition by submission_date order by no_of_submissions desc, hacker_id) as rn
+, ROW_NUMBER() over(partition by submission_date order by no_of_submissions desc, hacker_id) as rn
 from cte2
 )
 
@@ -1326,6 +1313,72 @@ where rn=1
 order by submission_date
 
 ```
+![alt text](image-1.png)
 
+------
 
+Write a solution to report the customer ids from the Customer table that bought all the products in the Product table.
+Return the result table in any order. The result format is in the following example.
 
+ 
+
+Example 1:
+
+Input: 
+Customer table:
+| customer_id | product_key |
+|-------------|-------------|
+| 1           | 5           |
+| 2           | 6           |
+| 3           | 5           |
+| 3           | 6           |
+| 1           | 6           |
+
+Product table:
+| product_key |
+|-------------|
+| 5           |
+| 6           |
+
+Output: 
+
+| customer_id |
+|-------------|
+| 1           |
+| 3           |
+
+Explanation: 
+The customers who bought all the products (5 and 6) are customers with IDs 1 and 3.
+
+```sql
+select customer_id
+from customer 
+group by customer_id
+having count(distinct Product_key)>= (select count(*) from product)
+
+-- or 
+
+select
+customer_id
+from customer c
+join product p
+on c.product_key = p.product_key
+group by customer_id
+having count (distinct c.product_key) = (select count(product_key) from product)
+
+```
+
+---
+
+![alt text](image-2.png)
+
+```sql
+with cte as (select * ,
+row_number() over(partition by customer_id order by event_date desc) as rn
+from subscription_history
+where event_date <= '2020-12-31') 
+
+select count(*)
+from cte
+where rn=1 and event !='C' and DATEADD (month,subscription_period,event_date)>= '2020-12-31'
+```
