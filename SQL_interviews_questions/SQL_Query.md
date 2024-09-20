@@ -1128,7 +1128,7 @@ The Employee table holds all employees. The employee table has three columns: Em
 
 Write a SQL query to find the median salary of each company. Bonus points if you can solve it without using any built-in SQL functions.
 
-|-----|------------|--------|
+
 |Id   | Company    | Salary |
 |-----|------------|--------|
 |5    | A          | 451    |

@@ -3,8 +3,8 @@
     For l in listt:
     Pass
 ```
-I >> represent loop iteration variable represent the element that the loop is currently processing  and it take its value from the iterable (listt)
-By default it convert iterable object to iterator to use next
+I >> represent loop **iteration variable** represent the element that the loop is currently processing  and it take its value from the **iterable** (listt)
+By default it convert iterable object to **iterator** to use next
 
 ```python
 #For Loop Already Calls iter() Method on The Iterable(list, tuple , set, dictionary,string) Behind The Scene.
@@ -294,7 +294,7 @@ myUltimateSkills ={"HTML":{"Main":"80%","Pugjs":"80%"},
 for main_key,main_value in myUltimateSkills.items(): #.items it get all dict items in tuple like ("HTML",{"Main":"80%","Pugjs":"80%"})
     print(f"{main_key} Progress Is: ")
     for child_key,child_value in main_value.items():
-    print(f"- {child_key} => {child_value}")
+        print(f"- {child_key} => {child_value}")
 ## unpacking dict operator 
     First={'x':1,}
     Second={'x':5,"y":4}
@@ -308,7 +308,7 @@ length = len(my_dict)   # Returns the number of key-value pairs in the dictionar
 is_present = 'key1' in my_dict   # Returns True if 'key1' is present in the dictionary
 value = my_dict.get('key', 'default_value')  # Returns the value for 'key' if it exists, otherwise returns 'default_value'
 #join
-myDict{"name": "John", "country": "Norway"}
+myDict= {"name": "John", "country": "Norway"}
 mySeparator = "TEST"
 x = mySeparator.join(myDict)
 # More Advanced Techniques and Functions
@@ -354,9 +354,9 @@ files.close()
 With open('another_file.txt','r') as f:  #it will close the file after reading it
     File_data = f.read()
 
- So, essentially, the code reads all the PDF files from the specified directory, converts each file to HTML format, and saves the HTML output in a file with the same name as the PDF file but with an extension of ".html".
+# So, essentially, the code reads all the PDF files from the specified directory, converts each file to HTML format, and saves the HTML output in a file with the same name as the PDF file but with an extension of ".html".
     
-directory = "D:\\courses\\project_atom\\"#
+directory = "D:\\courses\\project_atom\\"
 pdf_files = [f for f in os.listdir(directory) if f.endswith('.pdf')]
 for pdf_file in pdf_files:
     text = convert_pdf(f"D:\\courses\\project_atom\\{pdf_file}","html","utf-8")
