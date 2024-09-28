@@ -1656,6 +1656,22 @@ In summary, table statistics are a crucial part of the database's optimization p
     ```  
 This process results in a partitioned table where data is organized based on the specified column (in this case, Date), and each partition corresponds to a specific range (e.g., month). Partitioning is beneficial for improving query performance, especially with large datasets.
 
+15. **To know the time of the query**  
+you can use this and run you query it will show the time in the messange tab
+```sql 
+SET STATISTICS TIME ON; 
+```
+OR
+```sql
+DECLARE @StartTime DATETIME = GETDATE();
+
+-- Your query here
+SELECT * FROM YourTable;
+
+DECLARE @EndTime DATETIME = GETDATE();
+PRINT 'Total execution time (in milliseconds): ' + CAST(DATEDIFF(MILLISECOND, @StartTime, @EndTime) AS VARCHAR);
+```
+
 ## query lifecycle how optimizer work 
 
 ![alt text](image.png)
