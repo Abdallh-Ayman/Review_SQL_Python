@@ -1,26 +1,3 @@
----
-title: JavaScript
-date: 2020-12-24 17:12:25
-background: bg-[#ebd94e]
-tags:
-  - js
-  - web
-categories:
-  - Programming
-intro: |
-  A JavaScript cheat sheet with the most important concepts, functions, methods, and more. A complete quick reference for beginners.
-plugins:
-  - copyCode
----
-
-## Getting Started
-
-### Introduction
-
-JavaScript is a lightweight, interpreted programming language.
-
-- [JSON cheatsheet](/json) _(cheatsheets.zip)_
-- [Regex in JavaScript](/regex#regex-in-javascript) _(cheatsheets.zip)_
 
 ### Console
 
@@ -253,7 +230,7 @@ The `==` just check the value, `===` check both the value and the type.
 ## JavaScript Functions
 
 ### Functions Declaration
-
+- Function declarations are hoisted to the **top of their containing scope**. This means that you can call the function before it is defined in the code.
 ```javascript
 // Defining the function:
 function sum(num1, num2) {
@@ -265,6 +242,7 @@ sum(3, 6); // 9
 ```
 
 ### Function Expressions
+- Function expressions are not hoisted in the same way as function declarations. Only the variable declaration is hoisted, but the assignment to the function happens at runtime. Therefore, you cannot call the function before the expression is defined.
 
 ```javascript
 const dog = function () {
@@ -284,6 +262,21 @@ function rocketToMars() {
 const rocketToMars = function () {
   return "BOOM!";
 };
+```
+### Self-Invoking Functions
+
+Function expressions can be made "self-invoking".  
+- A self-invoking expression is invoked (started) automatically, without being called.  
+- Function expressions will execute automatically if the expression is followed by ().  
+- You cannot self-invoke a function declaration.  
+- You have to add parentheses around the function to indicate that it is a function expression:
+- #### Why use a self-invoking function?
+**Avoids polluting the global scope:** Variables inside the function stay within the function scope, not the global one.  
+**Useful in older code:** Before the introduction of modern ES6 features like block-scoped variables (let and const), IIFEs were commonly used to create isolated scopes.
+```javascript
+(function () {
+  let x = "Hello!!";  // I will invoke myself
+})();
 ```
 
 ### Arrow Functions (ES6) {.row-span-2}
@@ -1157,7 +1150,7 @@ class Song {
 }
 ```
 
-### extends
+### extends (inherit)
 
 ```javascript
 // Parent class
@@ -1264,7 +1257,60 @@ console.log(myMath.multiply(6, 2)); // 12
 console.log(myMath.duplicate(5)); // 10
 ```
 
+## Single-Threaded vs Multi-Threaded
+
+| **Aspect**              | **Single-Threaded**                        | **Multi-Threaded**                         |
+|-------------------------|--------------------------------------------|--------------------------------------------|
+| **Number of Threads**    | One thread of execution                    | Multiple threads of execution              |
+| **Task Execution**       | One task at a time (sequential execution)  | Multiple tasks can run simultaneously      |
+| **Performance**          | Limited when handling CPU-intensive tasks  | Better performance with parallelizable tasks|
+| **Blocking**             | A long task can block the entire program   | Tasks run in parallel, minimizing blocking |
+| **Complexity**           | Simpler to implement, fewer issues to handle| More complex, requires thread management   |
+| **Concurrency Issues**   | No race conditions or deadlocks            | Potential for race conditions, deadlocks   |
+
+- Even though **JavaScript is single-threaded**, you can simulate doing multiple tasks at once using asynchronous programming methods like callbacks, promises, and async/await.
+
+If true parallelism is needed, JavaScript can use Web Workers to run scripts in background threads.
+Example using Web Workers:
+
+```javascript
+// Main thread
+const worker = new Worker('worker.js');
+worker.postMessage('Start the background task');
+
+// worker.js (runs in a separate thread)
+self.onmessage = (message) => {
+    console.log("Doing heavy work");
+    // Send the result back to the main thread
+    self.postMessage("Task Complete");
+};
+
+```
+In this example:  
+The main thread runs normal code, while the worker thread performs heavy computations in the background, allowing parallelism.
+
 ## JavaScript Promises {.cols-2}
+
+A Promise in JavaScript is an object that represents a task that will finish in the future, either successfully or with an error. It helps manage asynchronous operations easily more elegantly than callbacks (which can lead to "callback hell").
+
+example of **callback hell** 
+```javascript
+function getPizza(callback) {
+    //function code logic
+    callback()
+}
+getSalad(
+  function () {
+    getBeef(function () {
+      getPasta(function () {
+        getPizza(function () {
+          endMenu();
+        });
+      });
+    });
+  }
+);
+```
 
 ### Promise states {.row-span-2}
 
@@ -1322,7 +1368,53 @@ promise.then(
     console.error(err);
   },
 );
+// another example 
+const myPromise = new Promise((resolve, reject) => {
+    let success = true;
+    
+    setTimeout(() => {
+        if (success) {
+            resolve("Operation successful!"); // Fulfilled state
+        } else {
+            reject("Operation failed!"); // Rejected state
+        }
+    }, 2000);
+});
+
+myPromise
+    .then((message) => {
+        console.log(message); // If promise is fulfilled
+    })
+    .catch((error) => {
+        console.log(error); // If promise is rejected
+    });
+
+    myPromise
+    .then((result) => {
+        console.log(result); // First promise result
+        return new Promise((resolve) => {
+            setTimeout(() => resolve("Second operation complete"), 1000);
+        });
+    })
+    .then((secondResult) => {
+        console.log(secondResult); // Second promise result
+    })
+    .catch((error) => {
+        console.log("Error:", error);
+    });
+
+  // In this case, the second then() is executed after the first promise is fulfilled, and the result is passed along.
+
 ```
+resolve(): Marks the promise as fulfilled, passing the success value.  
+reject(): Marks the promise as rejected, passing an error message.  
+then() and catch()  
+.then(): It handles the successful resolution of the promise. It is executed when the promise is fulfilled.  
+.catch(): It handles errors or rejection of the promise.  
+Example Flow:  
+After 2 seconds, the setTimeout completes.  
+If success is true, resolve() is called, and the then() block logs "Operation successful!".  
+If success is false, reject() is called, and the catch() block logs "Operation failed!".  
 
 ### Promise.catch()
 
@@ -1441,9 +1533,27 @@ const someEvent = async () => {
 
 ## JavaScript Async-Await {.cols-2}
 
+Modern JavaScript provides async and await keywords, which make working with promises much cleaner. It allows you to write asynchronous code in a synchronous manner. 
+
+**async** marks a function as asynchronous.  
+**await** pauses the execution of the function until the promise is resolved or rejected.  
+It makes the code look cleaner and easier to read without chaining .then() and .catch().  
 ### Asynchronous
 
 ```javascript
+
+async function fetchData() {
+    try {
+        let result = await myPromise; // Waits for myPromise to resolve
+        console.log(result);
+    } catch (error) {
+        console.log(error); // Catches any errors
+    }
+}
+
+fetchData();
+
+//another example 
 function helloWorld() {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -1557,6 +1667,12 @@ xhr.open("GET", "mysite.com/getjson");
 
 `XMLHttpRequest` is a browser-level API that enables the client to script data transfers via JavaScript, NOT part of the
 JavaScript language.
+
+//GET = > Get Data  
+//POST = > Send Data to backend  
+//PUT = >   update big data  //more common
+//PATCH = > update small data  
+//DELETE=> Delete Data  
 
 ### GET
 
