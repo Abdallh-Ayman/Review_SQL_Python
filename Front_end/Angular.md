@@ -480,12 +480,41 @@ To handle and consume http requests
 
 1. Add import to module
 ```ts
+// service ts file 
 import { HttpClientModule} from "@angular/common/http";
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class MoviesService {
+
+  constructor(private _HttpClient: HttpClient) { }
+
+  getTrendingMovies(): Observable<any> { // this will return Observable from any data type as i didn't know what the api will return  
+    return this._HttpClient.get('https://api.themoviedb.org/3/trending/movie/week?api_key=your_api_key');
+  }
+
+}
 ```
 
 2. Usage
 ```ts
+
 import {HttpClient} from '@angular/common/http';
+trendindMovies:any [ ] = [];  
+constructor( _MoviesService:MoviesService )
+{
+                                        // subscribe function it will subscribe this observable and wait it for output
+    _MoviesService.getTrendingMovies().subscribe( (data) =>{  // (this method if it return data succesfully )
+                                                              // you should to make arrow function to git the data in the parameter function 
+
+        this.trendindMovies =data.results ;
+        
+    }
+    ,(error) =>{ console.log(error)} , () => {console.log('done') } // it will run this method at the end if it give data or it give error 
+    )
+}
 
 ...
 

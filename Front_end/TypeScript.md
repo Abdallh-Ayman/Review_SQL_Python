@@ -1,16 +1,9 @@
 # TypeScript Cheatsheet
 Set of basic functionalities from TypeScript in one place. 
 
-Cheatsheet was created by https://foreach.pl trainers for their students.
+Please note that some functionalities are part of ES201x but they are frequently used in TypeScript as well.  
 
-Please note that some functionalities are part of ES201x but they are frequently used in TypeScript as well.
-
-**Check also other Cheatsheets:**
-
-[Angular](https://github.com/delprzemo/angular-cheatsheet)
-
-[ReactJS](https://github.com/delprzemo/react-cheatsheet)
-
+Typescript is better than javascript in data typing this make the development has less error and make the code perdictable.  
 
 # Table of Contents
 
@@ -68,6 +61,33 @@ Command-line interface for Angular - set of commands that will help us during de
 | Object | let x:Object = {id: 2}; | Represents any object
 | Function | let myFn:Function = function() {...} | Represents any function
 
+### Custom Data type
+we make it through using interface(custom class).  
+1- we can't make new object from interface like in the class.  
+2- you can use class insteade of interface but the class will be in the memory without deleting it but the interface will be deleted.  
+```TYPESCRIPT
+// interface user.ts file 
+
+import { User } from'./user';
+export interface User{
+    nameString,
+    gender:String,
+    age:number,
+    salary:number,
+    id?:number //? this mean that id will be optional 
+
+}
+//=====================================================================
+
+ users:user[] = [                              // now you can't make salary and age string and id is optional 
+  {name:'ahmed', age:25, gender:'male', salary:5000, id: 1 ,dateOfBirth:'1/1/2001'},
+  {name:'ali', age:25, gender:'male', salary:5030, dateOfBirth:'1/1/2001'},
+  {name:'aya', age:22, gender:'female', salary:5500, dateOfBirth:'1/1/2001'},
+  {name:'sayed', age:25, gender:'male', salary:5800, dateOfBirth:'1/1/2001'},
+  {name:'aml', age:26, gender:'female', salary:5000, dateOfBirth:'1/1/2001'}
+];
+
+```
 ## Destructing and spread
 This is ES functionality 
 
