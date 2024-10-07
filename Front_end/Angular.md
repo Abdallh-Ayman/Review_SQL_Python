@@ -179,13 +179,13 @@ export class AppModule { }
 | `{{user.name}}` | Interpolation - generates the user name here | `<h1>{{user.name}}</h1>` |
 | `<img [src]="user.imageUrl">` | Property binding - binds the image URL of the user to the `src` attribute | `<img [src]="user.imageUrl" alt="User Image">` |
 | `(event)="method($event)"` | Event binding - assigns a function to an event like click, keyup, etc. It also allows access to the DOM event object with `$event` and the use of event modifiers such as `keydown.enter`, `click.stop` to control event behavior. | `<button (click)="do()">Click me</button>` (Basic); `<button (click)="handleClick($event)">Click me</button>` (With event object); `<input (keydown.enter)="onEnter($event)">` (Event modifier); `<input (keyup)="onKey($event)">` (Event with key details) |
-| `<button *ngIf="user.showSth" ... />` | Structural directive - shows the button when `user.showSth` is true | `<button *ngIf="user.showSth">Show me</button>` |
-| `*ngFor="let item of items"` | Iterates through the items list | `<li *ngFor="let item of items">{{ item.name }}</li>` |
 | `<div [ngClass]="{green: isTrue(), bold: itTrue()}"/>` | Angular `ngClass` binding | `<div [ngClass]="{green: isTrue(), bold: itTrue()}">Content</div>` |
 | `<div [ngStyle]="{'color': isTrue() ? '#bbb' : '#ccc'}"/>` | Angular `ngStyle` binding | `<div [ngStyle]="{'color': isTrue() ? '#bbb' : '#ccc'}">Styled text</div>` |
 | `[class.bg-danger]="onSale"` | Class binding - conditionally applies the `bg-danger` class based on `onSale` boolean value | `<h2 [class.bg-danger]="onSale">Hello</h2>` |
 | `[style.color]="onSale ? 'red' : 'green'"` | Style binding - conditionally sets the color of the text based on `onSale` boolean value | `<h2 [style.color]="onSale ? 'red' : 'green'">Hello</h2>` |
 | `[(ngModel)]="user.name"` | Two-way data binding - synchronizes data between the model and the view. Requires importing `FormsModule`. | `<input [(ngModel)]="user.name">`; updates `user.name` in the component when the user types in the input field |
+| `<button *ngIf="user.showSth" ... />` | Structural directive - shows the button when `user.showSth` is true | `<button *ngIf="user.showSth">Show me</button>` |
+| `*ngFor="let item of items"` | Iterates through the items list | `<li *ngFor="let item of items">{{ item.name }}</li>` |
 
 
 
