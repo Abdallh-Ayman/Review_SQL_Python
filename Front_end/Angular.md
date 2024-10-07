@@ -112,6 +112,7 @@ Command line inferface for Angular - set of commands that will help us during de
 # Components and Templates
 
 Components are the most basic UI building block of an Angular app. An Angular app contains a tree of Angular components.
+![alt text](image.png)
 
 ## Sample component ts file
 ```ts
@@ -129,8 +130,24 @@ export class AppComponent {
 }
 ```
 
-## Component attributes
+## Sample module ts file
 
+```ts
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+
+@NgModule({
+	declarations: [AppComponent], // it will contains all components that will be inside this module , pipes, directives
+	imports: [BrowserModule, AppRoutingModule], // other modules if my module depend on another module 
+	providers: [], // services
+	bootstrap: [AppComponent] // top component , this is the root component 
+})
+export class AppModule { }
+```
+
+## Component attributes
 
 | Attribute  | Description |
 | ------------- | ------------- |
@@ -155,17 +172,24 @@ export class AppComponent {
 | ngAfterContentInit  | Called once after the first ngDoCheck().  |
 | ngAfterViewInit  | Called once after the first ngAfterContentChecked().   |
 
-## Template syntax
+## Data Bindding
 
-| Syntax  | Description |
-| ------------- | ------------- |
-| {{user.name}}	| Interpolation - just generate user name here  |
-| <img [src] = "user.imageUrl">	| property binding - bind image url for user to src attribute  |
-| <button (click)="do()" ... />	| Event - assign function to click event  |
-| <button *ngIf="user.showSth" ... />	| Show button when user.showSth is true  |
-| *ngFor="let item of items"	| Iterate through items list |
-| <div [ngClass]="{green: isTrue(), bold: itTrue()}"/> | Angular ngClass attribute  |
-| <div [ngStyle]="{'color': isTrue() ? '#bbb' : '#ccc'}"/>	| Angular ngStyle attribute  |
+| Syntax  | Description | Example |
+| ------------- | ------------- | ------------- |
+| `{{user.name}}` | Interpolation - generates the user name here | `<h1>{{user.name}}</h1>` |
+| `<img [src]="user.imageUrl">` | Property binding - binds the image URL of the user to the `src` attribute | `<img [src]="user.imageUrl" alt="User Image">` |
+| `(event)="method($event)"` | Event binding - assigns a function to an event like click, keyup, etc. It also allows access to the DOM event object with `$event` and the use of event modifiers such as `keydown.enter`, `click.stop` to control event behavior. | `<button (click)="do()">Click me</button>` (Basic); `<button (click)="handleClick($event)">Click me</button>` (With event object); `<input (keydown.enter)="onEnter($event)">` (Event modifier); `<input (keyup)="onKey($event)">` (Event with key details) |
+| `<button *ngIf="user.showSth" ... />` | Structural directive - shows the button when `user.showSth` is true | `<button *ngIf="user.showSth">Show me</button>` |
+| `*ngFor="let item of items"` | Iterates through the items list | `<li *ngFor="let item of items">{{ item.name }}</li>` |
+| `<div [ngClass]="{green: isTrue(), bold: itTrue()}"/>` | Angular `ngClass` binding | `<div [ngClass]="{green: isTrue(), bold: itTrue()}">Content</div>` |
+| `<div [ngStyle]="{'color': isTrue() ? '#bbb' : '#ccc'}"/>` | Angular `ngStyle` binding | `<div [ngStyle]="{'color': isTrue() ? '#bbb' : '#ccc'}">Styled text</div>` |
+| `[class.bg-danger]="onSale"` | Class binding - conditionally applies the `bg-danger` class based on `onSale` boolean value | `<h2 [class.bg-danger]="onSale">Hello</h2>` |
+| `[style.color]="onSale ? 'red' : 'green'"` | Style binding - conditionally sets the color of the text based on `onSale` boolean value | `<h2 [style.color]="onSale ? 'red' : 'green'">Hello</h2>` |
+| `[(ngModel)]="user.name"` | Two-way data binding - synchronizes data between the model and the view. Requires importing `FormsModule`. | `<input [(ngModel)]="user.name">`; updates `user.name` in the component when the user types in the input field |
+
+
+
+
 
 ## Input and Output
 
@@ -365,10 +389,10 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 @NgModule({
-	declarations: [AppComponent], // components, pipes, directives
-	imports: [BrowserModule, AppRoutingModule], // other modules
+	declarations: [AppComponent], // it will contains all components that will be inside this module , pipes, directives
+	imports: [BrowserModule, AppRoutingModule], // other modules if my module depend on another module 
 	providers: [], // services
-	bootstrap: [AppComponent] // top component
+	bootstrap: [AppComponent] // top component , this is the root component 
 })
 export class AppModule { }
 ```
@@ -1122,3 +1146,139 @@ Use 'set' accessor
   // some logic here
 }
 ```
+
+------------------
+
+The `angular.json` file is a key configuration file in Angular projects. It defines how the Angular CLI builds, serves, tests, and packages the application. This file provides a centralized location for project settings, build options, and different environments. Let's break down the key sections and purpose of this file:
+
+### Purpose of `angular.json`
+1. **Project Configuration**: It stores configurations for the Angular project, such as where the source files are located, which assets to include, and how to build the project.
+2. **Build and Serve Options**: Defines how the application should be built and served (e.g., the development server's settings, output folder, optimizations).
+3. **Multi-Project Setup**: Supports multiple applications or libraries in a single workspace by allowing separate configurations for each.
+4. **Customization**: Allows customization of build, test, and serve options for different environments (development, production, etc.).
+
+### Key Sections of `angular.json`
+
+1. **`version`**:
+   - This specifies the version of the schema that the file follows.
+
+   ```json
+   "version": 1
+   ```
+
+2. **`projects`**:
+   - Defines each project in the workspace (e.g., an application or library).
+   - Each project contains configurations like root directory, source directory, and architect options (for building, serving, testing, etc.).
+
+   Example of an application project:
+   ```json
+   "projects": {
+     "my-app": {
+       "projectType": "application",
+       "root": "",
+       "sourceRoot": "src",
+       "prefix": "app",
+       "architect": { ... }
+     }
+   }
+   ```
+
+3. **`architect`**:
+   - Inside each project, the `architect` section configures different tasks (build, serve, test, lint, etc.).
+   - Each task can have various options and configurations for different environments (e.g., development vs. production).
+
+   Example:
+   ```json
+   "architect": {
+     "build": {
+       "builder": "@angular-devkit/build-angular:browser",
+       "options": { ... },
+       "configurations": {
+         "production": { ... }
+       }
+     },
+     "serve": {
+       "builder": "@angular-devkit/build-angular:dev-server",
+       "options": { ... },
+       "configurations": {
+         "production": { ... }
+       }
+     }
+   }
+   ```
+
+4. **`defaultProject`**:
+   - Specifies which project is the default when running Angular CLI commands without specifying a particular project.
+
+   ```json
+   "defaultProject": "my-app"
+   ```
+
+### Important Properties in `architect` Section:
+
+- **`build`**: This section defines how the application should be built.
+  - Options like `outputPath`, `index`, `main`, `polyfills`, and `tsConfig` are specified here.
+  - Build configurations (e.g., production, development) are defined here for different environments.
+
+  Example:
+  ```json
+  "build": {
+    "builder": "@angular-devkit/build-angular:browser",
+    "options": {
+      "outputPath": "dist/my-app",
+      "index": "src/index.html",
+      "main": "src/main.ts",
+      "polyfills": "src/polyfills.ts",
+      "tsConfig": "tsconfig.app.json"
+    },
+    "configurations": {
+      "production": {
+        "fileReplacements": [{
+          "replace": "src/environments/environment.ts",
+          "with": "src/environments/environment.prod.ts"
+        }],
+        "optimization": true
+      }
+    }
+  }
+  ```
+
+- **`serve`**: This section configures how the application is served during development.
+  - It can specify things like `host`, `port`, and `proxyConfig` for running the development server.
+
+  Example:
+  ```json
+  "serve": {
+    "builder": "@angular-devkit/build-angular:dev-server",
+    "options": {
+      "browserTarget": "my-app:build"
+    },
+    "configurations": {
+      "production": {
+        "browserTarget": "my-app:build:production"
+      }
+    }
+  }
+  ```
+
+- **`test`**: Defines how unit tests are executed using Angular's testing framework.
+  ```json
+  "test": {
+    "builder": "@angular-devkit/build-angular:karma",
+    "options": {
+      "main": "src/test.ts",
+      "polyfills": "src/polyfills.ts",
+      "tsConfig": "tsconfig.spec.json",
+      "karmaConfig": "karma.conf.js"
+    }
+  }
+  ```
+
+### Summary:
+The `angular.json` file is critical for configuring various operations in an Angular project. It defines:
+- How to build the application.
+- How to serve it locally or in production.
+- Different configurations for different environments.
+- Multi-project support in a single workspace.
+
+It plays an essential role in controlling the build process, making it possible to have flexible workflows tailored to different needs.
