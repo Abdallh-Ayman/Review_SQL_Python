@@ -184,11 +184,7 @@ export class AppModule { }
 | `[class.bg-danger]="onSale"` | Class binding - conditionally applies the `bg-danger` class based on `onSale` boolean value | `<h2 [class.bg-danger]="onSale">Hello</h2>` |
 | `[style.color]="onSale ? 'red' : 'green'"` | Style binding - conditionally sets the color of the text based on `onSale` boolean value | `<h2 [style.color]="onSale ? 'red' : 'green'">Hello</h2>` |
 | `[(ngModel)]="user.name"` | Two-way data binding - synchronizes data between the model and the view. Requires importing `FormsModule`. | `<input [(ngModel)]="user.name">`; updates `user.name` in the component when the user types in the input field |
-| `<button *ngIf="user.showSth" ... />` | Structural directive - shows the button when `user.showSth` is true | <h2 *ngIf="productPrice > 7000 ; else hambozo" >web design and development</h2>
-<ng-template #hambozo>
-  <h2>Hi Hi</h2>
-</ng-template>
- |
+| `<button *ngIf="user.showSth" ... />` | Structural directive - shows the button when `user.showSth` is true | <h2 *ngIf="productPrice > 7000 ; else hambozo" >web design and development</h2> <ng-template #hambozo> <h2>Hi Hi</h2> </ng-template> |
 | `*ngFor="let item of items"` | Iterates through the items list | `<li *ngFor="let item of items">{{ item.name }}</li>` |
 
 
