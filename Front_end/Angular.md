@@ -335,7 +335,10 @@ Reference to element in html:
 
 
 # Routing
-The Angular Router enables navigation from one view to the next as users perform application tasks.
+The Angular Router enables navigation from one view to the next as users perform application tasks, so it consist from two the main componnent(1-**Path** , 2-**component** {that will be opened when the user go to this path}).  
+**3-router-outlet**  
+Acts as a placeholder that Angular dynamically fills based on the current router state. Generally in place of <router-outlet> your main **app component** will be generated.  
+4-**routerLink**  in usage in the HTML, It only update the path of the page to give it to the routing.ts file.  
 
 **Sample routing ts file**
 ```ts
@@ -407,9 +410,10 @@ and assing it in routing module:
     component: ArtistComponent,
     canActivate: [AlwaysAuthGuard], 
     children: [
-      {path: '', redirectTo: 'tracks'},
+      {path: '', redirectTo: 'tracks'},  // there is parameter called pathMatch : 'full' it will match same exact of the word(first match) and 'prefix' it will find if there any match
       {path: 'tracks', component: ArtistTrackListComponent},
       {path: 'albums', component: ArtistAlbumListComponent},
+      {path:'**' , component : NotfoundComponent}          // ** means anything if the user type anything path it will show the notfoundcomponent, not: we should write it at the end as it will show if the user type anything  	
     ]
   }
 ```
@@ -435,12 +439,24 @@ export class AppModule { }
 ```
 
 # Services
-Components shouldn't fetch or save data directly and they certainly shouldn't knowingly present fake data. They should focus on presenting data and delegate data access to a service.
+Components shouldn't fetch or save data directly and they certainly shouldn't knowingly present fake data. They should focus on presenting data and delegate data access to a service.  
+sevice: it is **shared data and logic** between the components.  
 
 **Sample service with one function**
 ```ts
-@Injectable()
+@Injectable({
+	providedIn : 'root' // (service scope)  It mean that this sevice is privided on all modules and its component 
+				// i also can but number of modules to be avalable to this modules only and import this module in the service ts file 
+}
+)
 export class MyService {
+	users = [
+  		{name:'ahmed', age:25, gender:'male', salary:5000, dateOfBirth:'1/1/2001'},
+  		{name:'ali', age:25, gender:'male', salary:5030, dateOfBirth:'1/1/2001'},
+		{name:'aya', age:22, gender:'female', salary:5500, dateOfBirth:'1/1/2001'},
+		{name:'sayed', age:25, gender:'male', salary:5800, dateOfBirth:'1/1/2001'},
+		{name:'aml', age:26, gender:'female', salary:5000, dateOfBirth:'1/1/2001'}
+		];
 	public items: Item[];
 	constructor() { }
 	
@@ -451,15 +467,15 @@ export class MyService {
 ```
 **Usage**
 It should be injected before usage
-```ts 
-constructor(private dogListService: MyService) 
-```
-
-and add in module:
-
 ```ts
-providers: [MyService]
+homeUsers:any = []
+constructor((_UsersService : UsersService) // this to make object from the service class 
+{
+	this.homeUsers=_UsersService.users // to access the users list and assign it to my empty list 
+}
 ```
+
+
 
 ## HttpClient
 To handle and consume http requests
