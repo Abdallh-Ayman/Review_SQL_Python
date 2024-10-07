@@ -198,8 +198,8 @@ users = [
 ];
 ```
 ```HTML
-<!-- *ngIf it will not show the table if users list come empty from api for exampe  -->
-<table *ngIf="users.length > 0" class="table w-75 m-auto text-center">  
+<!-- *if users list come empty from api for exampe ngIf will not show the table and will show 'Sorry No Data' from ng-template     -->
+<table *ngIf="users.length > 0 : else hambozo" class="table w-75 m-auto text-center">  
   <thead>
     <th>Index</th>
     <th>name</th>
@@ -220,6 +220,9 @@ users = [
   </tbody>
 </table>
 
+<ng-template #hambozo>
+	<h2>Sorry No Data </h2>
+</ng-template>
 ```
 
 
