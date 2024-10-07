@@ -198,8 +198,10 @@ users = [
 ];
 ```
 ```HTML
-<table class="table w-75 m-auto text-center">
+<!-- *ngIf it will not show the table if users list come empty from api for exampe  -->
+<table *ngIf="users.length > 0" class="table w-75 m-auto text-center">  
   <thead>
+    <th>Index</th>
     <th>name</th>
     <th>age</th>
     <th>gender</th>
@@ -207,7 +209,8 @@ users = [
     <th>dateOfBirth</th>
   </thead>
   <tbody>
-    <tr *ngFor='let user of users'>
+    <tr *ngFor='let user of users ; let i = index '> 
+      <td>{{i}}</td>
       <td>{{user.name}}</td>
       <td>{{user.age}}</td>
       <td>{{user.gender}}</td>
