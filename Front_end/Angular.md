@@ -532,7 +532,22 @@ public send(val1: any, val2: any): Observable<any> {
 
 
 ```
+Here's a detailed and organized comparison table between **Promises** and **Observables** in Angular, covering all major features:
 
+| Feature                   | Promise                                                                                                       | Observable                                                                                             |
+|---------------------------|---------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
+| **Memory Management**     | Holds resources until completion (cannot be unsubscribed), which may cause memory leaks in some cases.       | Efficient **memory management** with unsubscribe support, preventing memory leaks in Angular apps by stopping unused Observables. |
+| **Eager vs. Lazy Execution**   | **Eager**: Begins execution as soon as it is created, regardless of whether `.then()` is called.           | **Lazy**: Does not start execution until you subscribe to it, giving more control over when it runs.   |
+| **Cancelable**            | **Not cancelable**: Once a Promise starts, it cannot be canceled, which may lead to unwanted processing or resource use. | **Cancelable**: Can be canceled by unsubscribing, which stops execution and frees up resources.       |
+| **Single or Multiple Values** | Handles a **single value** (or error). Once resolved or rejected, it doesn’t produce any more values.       | Handles **multiple values** over time. Can emit a sequence of values, making it ideal for streams or ongoing events. |
+| **Error Handling**        | Errors are caught using `.catch()`. If there’s an error, it terminates and does not provide further handling. | Errors can be handled with various RxJS operators like `.catchError()` and `.retry()`, allowing more complex error recovery. |
+| **Operators and Functional Programming** | Limited functionality with chaining via `.then()`, `.catch()`, and `.finally()` for basic transformations. | Rich set of **RxJS operators** (e.g., `.map()`, `.filter()`, `.reduce()`, `.retry()`) for complex data transformation and control. |
+| **Execution Context**     | **Always asynchronous**: Executes code in a microtask queue, ensuring it completes after the current script. | **Can be both synchronous and asynchronous**: Executes based on the Observable’s definition and the subscriber’s actions. |
+| **Best Use Cases**        | **Single async operations** like HTTP requests or tasks with a single response (e.g., fetching data once).     | **Real-time data streams** like WebSockets, user interactions, or periodic data updates where multiple values are emitted. |
+| **Syntax**                | `.then()` for handling results, `.catch()` for errors, and `.finally()` for cleanup after completion.          | `.subscribe()` to receive data, `.unsubscribe()` to cancel, and a variety of operators for processing data. |
+| **Angular Integration**   | Often converted to Observable with `.toPromise()` but lacks Angular’s reactive approach for handling streams.  | Fully compatible with Angular’s reactive programming paradigm and RxJS, making it ideal for event handling and real-time data. |
+
+This table outlines each feature in detail, helping you understand when to use Promises versus Observables in Angular. Promises are simple and direct for single asynchronous operations, while Observables are more powerful, flexible, and suitable for real-time or multi-event scenarios.
 ## Dependency Injection
 
 Inject class into another class
