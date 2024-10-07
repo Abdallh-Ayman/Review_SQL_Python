@@ -1,4 +1,4 @@
-# Angular Cheatsheet
+	# Angular Cheatsheet
 Set of basic functionalities from Angular in one place. Thanks to http://foreach.pl for contribute
 
 **Check also other Cheatsheets:**
@@ -185,8 +185,39 @@ export class AppModule { }
 | `[style.color]="onSale ? 'red' : 'green'"` | Style binding - conditionally sets the color of the text based on `onSale` boolean value | `<h2 [style.color]="onSale ? 'red' : 'green'">Hello</h2>` |
 | `[(ngModel)]="user.name"` | Two-way data binding - synchronizes data between the model and the view. Requires importing `FormsModule`. | `<input [(ngModel)]="user.name">`; updates `user.name` in the component when the user types in the input field |
 | `<button *ngIf="user.showSth" ... />` | Structural directive - shows the h2 when `productPrice` is >7000 and if it is false it will show the ng-template  | `<h2 *ngIf="productPrice > 7000 ; else hambozo" >web design and development</h2>  <ng-template #hambozo>  <h2>Hi Hi</h2> </ng-template>` |
-| `*ngFor="let item of items"` | Iterates through the items list | `<li *ngFor="let item of items">{{ item.name }}</li>` |
+| `*ngFor="let item of items"` |I it in the element i want to repeat it , Iterates through the items list | `<li *ngFor="let item of items">{{ item.name }}</li>` |
 
+#### big example for ngFor 
+```TYPESCRIPT
+users = [
+  {name:'ahmed', age:25, gender:'male', salary:5000, dateOfBirth:'1/1/2001'},
+  {name:'ali', age:25, gender:'male', salary:5030, dateOfBirth:'1/1/2001'},
+  {name:'aya', age:22, gender:'female', salary:5500, dateOfBirth:'1/1/2001'},
+  {name:'sayed', age:25, gender:'male', salary:5800, dateOfBirth:'1/1/2001'},
+  {name:'aml', age:26, gender:'female', salary:5000, dateOfBirth:'1/1/2001'}
+];
+```
+```HTML
+<table class="table w-75 m-auto text-center">
+  <thead>
+    <th>name</th>
+    <th>age</th>
+    <th>gender</th>
+    <th>salary</th>
+    <th>dateOfBirth</th>
+  </thead>
+  <tbody>
+    <tr *ngFor='let user of users'>
+      <td>{{user.name}}</td>
+      <td>{{user.age}}</td>
+      <td>{{user.gender}}</td>
+      <td>{{user.salary}}</td>
+      <td>{{user.dateOfBirth}}</td>
+    </tr>
+  </tbody>
+</table>
+
+```
 
 
 
