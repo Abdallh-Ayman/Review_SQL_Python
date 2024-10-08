@@ -581,18 +581,32 @@ constructor(@Optional() @Inject(CONTROLS_GLOBAL_CONFIG) globalVlues: ControlsCon
 # Pipes
 Transform data/value to specific format, for example:
 
-Show date in shortDate format:
+Built in pipes:
 ```html
+<!-- Show date in shortDate format -->
 {{model.birthsDay | date:'shortDate'}}
+<!-- uppercase , currency-->
+ <td>{{user.name|uppercase}}</td>
+ <td> {{user.salary |currency:'EUR' }}</td>
+
 ```
 
-**Pipe implementation**
+
+**Pipe implementation(custom)**
 ```ts
-@Pipe({name: 'uselessPipe'})
+@Pipe({name: 'uselessPipe'}) // the name of your pip that you will call it in the html
+ 
 export class uselessPipe implements PipeTransform {
   transform(value: string, before: string, after: string): string {
     let newStr = `${before} ${value} ${after}`;
     return newStr;
+  }
+}
+
+export class SeemorePipe implements PipeTransform {
+  transform(overview:sting , count:number):string{
+    return overview.split(" ").slice(0,count).join(' ')
+   
   }
 }
 ```
@@ -600,6 +614,8 @@ export class uselessPipe implements PipeTransform {
 **usage**
 ```html
 {{ user.name | uselessPipe:"Mr.":"the great" }}
+
+<p>{{movie.overview| seemore:20}}</p>
 ```
 
 # Directives
