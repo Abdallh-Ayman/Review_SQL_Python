@@ -953,6 +953,8 @@ WHERE [StatusId] < 6
 SELECT [StatusId], [StatusName]
 FROM CTE
 
+-- to control the max number of recrusive iteration 
+OPTION ( MAXRECURSION 5000 )
 
 
 ```
@@ -1222,8 +1224,14 @@ FROM view_name
 WHERE some_column = some_value;
 ```
 ----
-## DCL
+## CTE vs subquery vs Timp Table vs CTAS(select into) vs View
+as my opinion, i first use view then ,CTEs(but don't use more than 5 ctes in one query), then somtime the subquery to help me , **if the view are slow i use CTAS** 
+<img src="CTE vs subquery vs tmp vs CTAS vs view.png" width='900px' hight='900px' > 
 
+#### Real_sernario
+<img src="Real_sernario.png" width='650px' hight='650px' >
+
+## DCL
 The **GRANT** statement is used to provide specific privileges or permissions to users or roles. These privileges can include the ability to execute certain SQL statements (e.g., SELECT, INSERT, UPDATE, DELETE) on specific database objects (e.g., tables, views) or even the ability to create or drop objects.
 **Grant SELECT permission on the "employees" table to a user named "john"**
 ```sql
