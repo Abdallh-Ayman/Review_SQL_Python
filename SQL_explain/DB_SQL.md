@@ -208,6 +208,15 @@ SELECT *
 INTO new_student_table  -- into it will creat new table 
 FROM student
 WHERE 1 = 0;
+
+-- TO Update the content of hte table as if i run the above query again it will give me error as it already exist
+IF OBJECT_ID('new_student_table','U') IS NOT NULL
+    DROP TABLE new_student_table;
+GO
+SELECT *
+INTO new_student_table  -- into it will creat new table 
+FROM student
+
 ```
  **BULK INSERT statement to insert data from a file into a table**
 ```sql
