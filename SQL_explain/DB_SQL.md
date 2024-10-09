@@ -200,7 +200,7 @@ VALUES ('A1', 'Chong', 'Raul', 'rfc@ibm.com', 'Toronto', 'CA'),('A2', 'Chongg', 
 ```
 **INSERT INTO SELECT:to copy only the schema from another table**
 ```SQL
-iNSERT INTO new_student_table   -- it need the table to be created 
+iNSERT INTO new_student_table   -- it need the table to be created before
 SELECT * FROM student;
 WHERE 1 = 0;
 `OR`
@@ -209,7 +209,7 @@ INTO new_student_table  -- into it will creat new table
 FROM student
 WHERE 1 = 0;
 
--- TO Update the content of hte table as if i run the above query again it will give me error as it already exist
+-- TO Update the content of the table as if i run the above query again it will give me error as it already exist
 IF OBJECT_ID('new_student_table','U') IS NOT NULL
     DROP TABLE new_student_table;
 GO
@@ -912,7 +912,7 @@ VALUES
 -------
 ## CTEs, Function, Stored procedures , Views
 - **CTEs**   
- CTEs(veiw in memory) stands for Common Table Expressions, which is a temporary result set that is defined within the execution of a single SQL statement. In other words, CTEs allow you to create a named query that can be referenced multiple times within the same SQL statement.CTEs are not functions in the sense that they do not take input parameters or return values, and they do not encapsulate a block of code that can be called from different parts of your code.  
+ CTEs(veiw in memory) stands for Common Table Expressions, which is a temporary result set that is defined within the execution of a single SQL statement. In other words, CTEs allow you to create a named query that can be **referenced multiple times** within the same SQL statement **unlike the subquery** that can be referneced **one time**.CTEs are not functions in the sense that they do not take input parameters or return values, and they do not encapsulate a block of code that can be called from different parts of your code.  
  CTEs allow you to **simplify complex queries** by breaking them down into smaller, more manageable **readable** and **maintainable**. And increase the **performance**.
 ```sql
  WITH my_cte AS (
