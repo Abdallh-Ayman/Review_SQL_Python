@@ -415,7 +415,8 @@ order by cte.total_challenge desc,hacker_id
 ```
 
 ---
-<img src="join.png" width='650px' hight='650px' >  ![alt text](image-14.png)
+<img src="join.png" width='650px' hight='650px' >  
+<img src="join2.png" width='650px' hight='650px' > 
 
 - **join**  
 **Inner Join**: Returns only the rows where there is a match in both tables.  
@@ -912,8 +913,9 @@ VALUES
 -------
 ## CTEs, Function, Stored procedures , Views
 - **CTEs**   
- CTEs(veiw in memory) stands for Common Table Expressions, which is a temporary result set that is defined within the execution of a single SQL statement. In other words, CTEs allow you to create a named query that can be **referenced multiple times** within the same SQL statement **unlike the subquery** that can be referneced **one time**.CTEs are not functions in the sense that they do not take input parameters or return values, and they do not encapsulate a block of code that can be called from different parts of your code.  
+ CTEs(veiw in memory) stands for Common Table Expressions, which is a temporary result set that is defined within the execution of a single SQL statement. In other words, CTEs allow you to create a named query that can be **referenced multiple times** within the same SQL statement **unlike the subquery** that can be referneced **one time**,So you can **reduce redundancy** using CTEs.CTEs are not functions in the sense that they do not take input parameters or return values, and they do not encapsulate a block of code that can be called from different parts of your code.  
  CTEs allow you to **simplify complex queries** by breaking them down into smaller, more manageable **readable** and **maintainable**. And increase the **performance**.
+ <img src="CTEs.png" width='650px' hight='650px' > 
 ```sql
  WITH my_cte AS (
     SELECT column1, column2, ...
