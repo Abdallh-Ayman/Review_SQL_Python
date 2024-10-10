@@ -324,7 +324,26 @@ ORDER BY first_name asc                                                    --ت�
 ORDER BY first_name DESC  
 ORDER BY statee , first_name                                          --هيرتب على حسب الاستيت عادى انما لو لقى متشابه هيرتب على حسب الاسم 
 ORDER BY quantity * unit_price DESC
- ```   
+ ```
+ ## Pagination
+ Pagination is often implemented using the `OFFSET` and `FETCH` clauses in SQL Server, which allow you to skip a certain number of rows and retrieve a specific number of rows from the result set.    
+ ```sql
+DECLARE @PageNumber INT = 3;
+DECLARE @RowsPerPage INT = 10;
+
+SELECT ProductID, ProductName, Price, StockQuantity
+FROM Products
+ORDER BY ProductID
+OFFSET (@PageNumber - 1) * @RowsPerPage ROWS
+FETCH NEXT @RowsPerPage ROWS ONLY;
+
+```
+
+- **`OFFSET`**: Specifies how many rows to skip before starting to return rows( the starting point [index]). Calculates how many rows to skip. For page 3, you skip (3 - 1) * 10 = 20 rows.  
+- **`FETCH NEXT`**: Specifies how many rows to return after the `OFFSET`.  
+
+----
+
  **You need to include ALL the columns that aren't in aggregate functions in your GROUP BY:**
  ```SQL
  select country , count(country) as Count 
