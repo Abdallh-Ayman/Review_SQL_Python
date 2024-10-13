@@ -716,7 +716,7 @@ FROM products;
 | **Multiple column subquery** | This type of subquery returns one or more rows and one or more columns. | SELECT column1, column2 FROM main_table <br> WHERE (column3, column4) IN ( SELECT sub_column1, sub_column2  FROM sub_table  HERE condition); |
 | **Correlated subquery** (CROSS join APPLY) | Evaluated once for each row of the outer query. | SELECT  e.first_name, m.first_name , m.salary AS manager_salary FROM employees e JOIN employees m ON e.manager_id = m.employee_id WHERE e.salary > m.salary; |
 
-### Semi Join VS Anti Join
+### Semi Join (IN AND EXISTS) VS Anti Join (NOT IN AND NOT EXISTS) 
 
 - **Semi Join**: Returns rows from the left table where a match exists in the right table.
 - **Anti Join**: Returns rows from the left table where no match exists in the right table.
