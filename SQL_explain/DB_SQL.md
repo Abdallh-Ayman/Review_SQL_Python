@@ -706,22 +706,91 @@ FROM products;
 ```
 ----
 ## **Subquery**   
+- can be used in various clauses like **SELECT, WHERE, and FROM**, making them a flexible tool for data extraction.but **CTEs** Can only be referenced in the **FROM** clause (or after WITH).
+- Not reusable in the same query (needs repetition). But **CTEs** Can be referenced multiple times, improving readability and performance in complex queries.  
 
 | Type of Subquery | Description | Example |
 | --- | --- | --- |
-| Scalar subquery | Returns a single value. | SELECT COUNT(*) FROM employees WHERE salary > (SELECT AVG(salary) FROM employees) |
-| Multi-row subquery | Returns multiple rows of results. And single column | SELECT column1, column2 FROM main_table WHERE column3 IN (SELECT column3 FROM sub_table WHERE condition);|
-| Multiple column subquery | This type of subquery returns one or more rows and one or more columns. to use > or > we should use any or all and to know the equalitly use IN | SELECT column1, column2 FROM main_table WHERE column3 IN (SELECT sub_column FROM sub_table WHERE condition);<br> SELECT column1, column2 FROM main_table WHERE column3 > ANY (SELECT sub_column FROM sub_table WHERE condition); <br> SELECT column1, column2 FROM main_table WHERE column3 > ALL (SELECT sub_column FROM sub_table WHERE condition); |
-| **Correlated subquery** (CROSS join APPLY) | Evaluated once for each row of the outer query. | SELECT * FROM employees WHERE salary > (SELECT salary FROM employees WHERE manager_id = employee_id) |
+| **Scalar subquery** | Returns a single value. | SELECT COUNT(*) FROM employees WHERE salary > (SELECT AVG(salary) FROM employees) |
+| **Multi-row subquery** | Returns multiple rows of results. And single column to use > or < we should use any or all and to know the equalitly use IN | SELECT column1, column2 FROM main_table WHERE column3 IN (SELECT column3 FROM sub_table WHERE condition);<br> SELECT column1, column2 FROM main_table WHERE column3 > ANY (SELECT sub_column FROM sub_table WHERE condition); <br> SELECT column1, column2 FROM main_table WHERE column3 < ALL (SELECT sub_column FROM sub_table WHERE condition);|
+| **Multiple column subquery** | This type of subquery returns one or more rows and one or more columns. | SELECT column1, column2 FROM main_table <br> WHERE (column3, column4) IN ( SELECT sub_column1, sub_column2  FROM sub_table  HERE condition); |
+| **Correlated subquery** (CROSS join APPLY) | Evaluated once for each row of the outer query. | SELECT  e.first_name, m.first_name , m.salary AS manager_salary FROM employees e JOIN employees m ON e.manager_id = m.employee_id WHERE e.salary > m.salary; |
+
+### Semi Join VS Anti Join
+
+- **Semi Join**: Returns rows from the left table where a match exists in the right table.
+- **Anti Join**: Returns rows from the left table where no match exists in the right table.
+
+A **semi join** returns rows from the left table where there is a **match in the right table**, but it only returns rows from the left table. It doesn't return duplicate rows if the right table has multiple matches, and it doesn't return columns from the right table.
+
+- **Example**: Find employees who have made a sale, but only return employee details (not the sales details).
+  
+  ```sql
+  SELECT e.employee_id, e.first_name
+  FROM employees e
+  WHERE EXISTS (
+      SELECT 1 
+      FROM sales s 
+      WHERE s.employee_id = e.employee_id
+  );
+  ```
+  - Here, the `EXISTS` clause ensures that we only get employees who have matching rows in the `sales` table, but it doesn't return data from `sales`.
+
+An **anti join** returns rows from the left table **where there is no match in the right table**. It filters out rows that have corresponding entries in the right table.
+
+- **Example**: Find employees who have **not made any sales**.
+  ```sql
+  SELECT e.employee_id, e.first_name
+  FROM employees e
+  WHERE NOT EXISTS (
+      SELECT 1 
+      FROM sales s 
+      WHERE s.employee_id = e.employee_id
+  );
+  ```
+
+- The `NOT EXISTS` clause ensures that only employees who don't have any matching rows in the `sales` table are returned.
 
 
-This subquery checks if there are any rows in the "Projects" table where the End_Date matches the Start_Date of the outer query's current row (P1.Start_Date). This subquery will be evaluated for each row in the outer query's result set. **Not exists** return true If there's no row in the subquery result so it return start date that isn't in end date.
+### IN / NOT IN vs EXISTS / NOT EXISTS
+| **Aspect**                | **IN / NOT IN**                                   | **EXISTS / NOT EXISTS**                               |
+|---------------------------|---------------------------------------------------|-------------------------------------------------------|
+| **Main Purpose**           | Compares values with a list from the subquery.    | Checks for the existence of rows in the subquery.      |
+| **Execution**              | Evaluates all rows returned by the subquery.      | Stops as soon as a match (or non-match) is found.      |
+| **Performance**            | Better for small result sets.<br> Can become inefficient with large data sets.                      | Better for large result sets. <br> Generally faster for large datasets due to early exit.                        |
+| **NULL Handling**          | `NOT IN` struggles with `NULL` values.            | `NOT EXISTS` handles `NULL` values efficiently.      |
+| **When to Use:**      | Use **`IN`** when working with smaller, known sets of values.<br> Avoid **`NOT IN`** when the subquery can return `NULL` values     | Use **`EXISTS`** when dealing with larger datasets, or when you need to check for the existence of related rows.<br> prefer **`NOT EXISTS`** for better performance and `NULL` handling |
+
+When using `IN`, SQL must evaluate **all rows** returned by the subquery, and the outer query compares each row's value against this full set.  
+```sql
+SELECT employee_id, first_name
+FROM employees 
+WHERE department_id IN (
+    SELECT department_id 
+    FROM departments 
+    WHERE location = 'New York'
+);
+```
+- **Execution**: In this case, the subquery (`SELECT department_id FROM departments...`) returns a **list of all department IDs** where the location is 'New York'.
+- The outer query then compares each employee's `department_id` against this full list of results.
+- **All rows** from the subquery are evaluated before making any decision for each employee.
+
+In contrast, when using `EXISTS`, SQL checks if **at least one row** satisfies the condition. As soon as a match is found, it stops further evaluation.
 
 ```sql
-SELECT ROW_NUMBER() OVER (ORDER BY P1.Start_Date ASC) AS 'ord', P1.Start_Date
-        FROM Projects P1
-        WHERE EXISTS (SELECT * from Projects P2 WHERE P2.End_Date = P1.Start_Date)
-```    
+SELECT employee_id, first_name
+FROM employees e
+WHERE EXISTS (
+    SELECT 1
+    FROM departments d
+    WHERE d.department_id = e.department_id 
+    AND d.location = 'New York'
+);
+```
+- **Execution**: For each employee, the subquery checks if **at least one** department exists where the employee's `department_id` matches and the department's location is 'New York'.
+- Once SQL finds a match for an employee, it **stops searching** the `departments` table further and returns that employee in the result set.
+- This can be faster, especially if the subquery can return many rows.
+
 ----
 ## **window function**    
 is a type of function that performs a calculation across a set of rows, called a window, within the result set of a query. The window function returns a value for each row in the result set, based on the values in the window.يعنى بياخد الجدول كوبى يعمل العمليه الحسابيه على الويندو مش على الجدول الاصلى والناتج بينضاف للجدول الاصلى من غير ماتغير فى الصفوف فى الجدول الاصلى زى مابيعمل الجروب باى الى بيعمل summarize كدا   
