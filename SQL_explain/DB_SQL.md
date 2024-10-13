@@ -1051,6 +1051,8 @@ OPTION ( MAXRECURSION 5000 )
 
 ```
 
+----
+
 To make the code more secure you should  make any code that will executed from the data base must be either a **procedures** or a **function**.  
 
 **Functions** are useful for encapsulating **calculations**, transformations, or lookups that need to be used in various SQL queries.  
@@ -1162,6 +1164,11 @@ END;
 
 SELECT * FROM dbo.GetStudentInfo('first name');
 ```
+
+### NULL Handling, built in function 
+
+
+
 
 - **Stored procedures**   
 **Stored procedures** can be reused across different parts of your application, reducing code duplication. To deal with our **data base**.
