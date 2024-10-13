@@ -901,6 +901,10 @@ where EmpSalaryRank = 1
     |2021-01-03	|100	|116|
     |2021-01-04|	50|	75|
 
+    - window function ALL **`ROWS BETWEEN`** usage 
+
+    <img src="window_function.png" width='650px' hight='650px' > 
+
 - **RANK**: This function assigns a unique rank to each row within the partition, **with gaps** in the ranking for tied rows. If two or more rows tie for a rank, they receive the same rank number, and the next rank number is **incremented by the number of tied rows**. For example, if two rows are tied for rank 1, they both receive rank 1, but the next row receives rank 3, not rank 2.
 - **DENSE_RANK**: This function also assigns a unique rank to each row within the partition, but **without gaps**. It increments the rank number by 1, regardless of the number of tied rows. For example, if two rows are tied for rank 1, they both receive rank 1, and the next row receives rank 2, even if there are multiple rows with the same score.
 - **NTILE()**: This function divides an ordered dataset into a specified number of roughly equal groups, called ‘tiles’. For example, NTILE(4) would split the data into four groups. The function then assigns a group number to each row1.
