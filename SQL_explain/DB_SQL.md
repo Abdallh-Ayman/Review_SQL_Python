@@ -1164,13 +1164,171 @@ END;
 
 SELECT * FROM dbo.GetStudentInfo('first name');
 ```
+---
 
 ### NULL Handling, built in function 
+- `NULL` means nothing, unknown!. **NULL is not equal to anything**. NULL is not zero, NULL is not empty string(it is stirng with lengh of 0), NULL is not blank space(string with lengh of num depend of the number of spaces).  
+- `NULL` is best for performance as it is very minimal for storage but empty string occupies memory and blank  occupies memory for each space.  
+
+<img src="null_function.png" width='900px' hight='900px' > 
+
+## 1. **Checking for NULL Values**
+   SQL Server uses `IS NULL` and `IS NOT NULL` to check for `NULL` values. You cannot use `=` or `!=` with `NULL` since `NULL` is not a value but a placeholder.
+
+   - **Example (IS NULL)**:
+     ```sql
+     SELECT * FROM Employees WHERE ManagerID IS NULL;
+     ```
+     This query retrieves employees who do not have a manager (i.e., `ManagerID` is `NULL`).
+
+   - **Example (IS NOT NULL)**:
+     ```sql
+     SELECT * FROM Employees WHERE ManagerID IS NOT NULL;
+     ```
+     This retrieves employees who have a manager.
 
 
+## 2. **ISNULL Function (only handles two arguments)** 
+   `ISNULL` is used to **replace** `NULL` with a specified replacement value. It works similarly to `COALESCE` but only accepts two arguments: the expression and the replacement value.
+
+- **Syntax**:
+
+     ```sql
+        ISNULL(Value , replacement_value ) 
+
+     ```
+
+- **Example**:
+    ```sql
+    SELECT FirstName, LastName, 
+       ISNULL(Email, PhoneNumber) AS ContactInfo -- replace the null from other column (if the other column is null also it will return null)
+     FROM Customers;
+
+    ISNULL(Email, 'No Contact Info') -- replace the null with static value (default value )
+    ```
+
+## 3. **COALESCE Function**
+
+   `COALESCE` returns the first non-`NULL` value in a list of arguments. It’s useful when you want to provide a default value when a `NULL` is encountered.
+
+- **Syntax**:
+     ```sql
+        COALESCE(Value , replacement_value1 ,replacement_value2 , replacement_value3 , ...... ) 
+
+     ```
+- **Example**:
+     ```sql
+    SELECT FirstName, LastName, 
+    COALESCE(Email, PhoneNumber, 'No Contact Info') AS ContactInfo
+    FROM Customers;
+     ```
+
+### Summary of Key Differences
+| Feature                  | `ISNULL`                       | `COALESCE`                              |
+|--------------------------|---------------------------------|-----------------------------------------|
+| **Arguments**             | Exactly 2 arguments             | Can take 2 or more arguments            |
+| **Performance**             | Fast for 2 arguments             | Slow ,Slightly slower when evaluating multiple arguments          |
+| **Portability**           | SQL Server-specific<br> oracle >> NVL <br> Mysql  >>  IFNULL  | Part of the SQL standard (more portable For all databases) |
+| **Return Type**           | Type of the first argument      | Type with the highest precedence        |
+| **Example Use**           | Simple replacement of `NULL`    | Replacement with multiple fallback values <br> (so i use it as it is standard but if i have bad performance i use `ISNULL` ) |
+
+### explain 3 polices to handle the null , empty string and blanks 
+```sql 
+WITH Orders AS (
+    SELECT 1 Id, 'A' Category UNION
+    SELECT 2, NULL UNION
+    SELECT 3, '' UNION  -- this is lengh of 0 string
+    SELECT 4, '  '      -- this is lengh of 3 string
+)
+SELECT 
+    *,
+    TRIM(Category) AS Policy1,  --to make blanks lengh of 0 
+    NULLIF(TRIM(Category), '') AS Policy2,  -- it take less storage and performace of the query will be realy good but use it if i in the ETL
+    COALESCE(NULLIF(TRIM(Category), ''), 'unknown') AS Policy3   -- IF I in the report i use it to to improve readiblity and reduce confusion.
+FROM Orders;
+
+```
+| Id  | Category | Policy1 | Policy2 | Policy3 |
+|-----|----------|---------|---------|---------|
+| 1   | A        | A       | A       | A       |
+| 2   | NULL     | NULL    | NULL    | unknown |
+| 3   |          |         | NULL    | unknown |
+| 4   |          |         | NULL    | unknown |
+
+## 4. **NULLIF Function**
+
+   `NULLIF` compares two expressions and returns `NULL` if they are equal; otherwise, it returns the first expression. It's useful for avoiding division by zero or marking specific values as `NULL`.
+
+   - **Syntax**:
+     ```sql
+     NULLIF(expression1, expression2)
+     ```
+
+   - **Example**:
+    
+     ```sql
+     SELECT ProductID, NULLIF(QuantitySold, 0) AS AdjustedQuantity  -- to give null to me not error 
+     FROM Sales;
+
+     NULLIF(price, -1 )  -- if the price is -1 then make it null as we won't to store the price as -1  
+     NULLIF(original_price , discount_price )  -- if they are equal then we should give null to flag the uncommon issue 
+     ```
+     If `QuantitySold` is 0, this function returns `NULL`.
+
+## 6. **Handling NULL in (Aggregation Functions) and (the join keys)**
+
+   - Aggregate functions like `SUM`, `COUNT`, `AVG`, `MAX`, and `MIN` ignore `NULL` values by default. However, `COUNT(*)` counts all rows, including those with `NULL`.
+
+   - **Example (SUM ignoring NULL ,COUNT excluding NULL)**:
+
+     ```sql
+      SELECT SUM(Salary) FROM Employees;
+      SELECT COUNT(Salary) FROM Employees;  -- Counts only non-NULL Salary
+
+     ```
+
+   - **Example (COUNT including NULL)**:
+
+     ```sql
+         SELECT COUNT(*) FROM Employees;  -- Counts all rows
+     ```
+
+- you should handle the null befor making join as the null vaules it will not be included in the join as sql can't make equlity of those values as shown in the photo it give me only two row.    
+
+     <img src="null_join.png" width='600px' hight='600px' > 
+
+     <img src="null_join_after.png" width='600px' hight='600px' > 
 
 
-- **Stored procedures**   
+## 7. **CASE Statement for NULL Handling**
+
+   You can use the `CASE` statement to explicitly handle `NULL` values in complex scenarios.
+
+   - **Example**:
+     ```sql
+     SELECT EmployeeID,
+       CASE 
+         WHEN ManagerID IS NULL THEN 'No Manager'
+         ELSE 'Has Manager'
+       END AS ManagerStatus
+     FROM Employees;
+
+     -- or you can use it in the sort to make the null in the bottom , you should handle the null before sorting the data 
+     SELECT 
+     CustomerID, Score
+     FROM  Sales.Customers
+     ORDER BY CASE WHEN Score IS NULL THEN 1 ELSE 0 END,  Score;
+
+     ```
+
+## 8. **NULL and Comparison Operators**
+   When you perform comparison operations (`=`, `!=`, `>`, `<`, etc.) involving `NULL`, the result is always `NULL` (because `NULL` means unknown). To handle this, use the functions described above.
+
+
+----
+
+## **Stored procedures** 
+
 **Stored procedures** can be reused across different parts of your application, reducing code duplication. To deal with our **data base**.
 --Can write all query type DDL , DML , insert , update delete.  
 -- have **more performance** on the **network traffic**(have less character while sending as a call from application to the DB) and **our engine** (it stored so we don't need make all cycle of execution plane again )  
