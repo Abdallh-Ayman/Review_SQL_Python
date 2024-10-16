@@ -1271,7 +1271,7 @@ FROM Orders;
    - **Example**:
     
      ```sql
-     SELECT ProductID, NULLIF(QuantitySold, 0) AS AdjustedQuantity  -- to give null to me not error 
+     SELECT ProductID, NULLIF(QuantitySold, 0) AS AdjustedQuantity  -- to give null to me not error when dividing by it
      FROM Sales;
 
      NULLIF(price, -1 )  -- if the price is -1 then make it null as we won't to store the price as -1  
@@ -1486,7 +1486,7 @@ WHERE some_column = some_value;
 ```
 ----
 ## CTE vs subquery vs Timp Table vs CTAS(select into) vs View
-as my opinion, i first use view then ,CTEs(but don't use more than 5 ctes in one query), then somtime the subquery to help me , **if the view are slow i use CTAS** 
+as my opinion, i first use view then ,CTEs(but don't use more than 5 ctes in one query), then somtime the subquery to help me , **if the view are slow i use CTAS(select into)** 
 <img src="CTE vs subquery vs tmp vs CTAS vs view.png" width='900px' hight='900px' > 
 
 #### Real_sernario
@@ -1543,7 +1543,7 @@ Additionally, subqueries, common table expressions (CTEs), and window functions 
 
 **This query will give error because the where executed before the select so it didn't see the alias name fullname.**
 ```sql 
-select st fname+' '+St Iname as fullname
+select st_fname+' '+St_Iname as fullname
 From Student
 where fullname= 'ahmed ali'
 -- You can make it as bellow the sub-query will execute first so it will see the fullname in the where statment
@@ -1602,8 +1602,12 @@ end catch
 ------
 ## Constrain VS Rule
 
-**Constrain** created on the level of tables.It is a rule or condition applied to a set of columns in a table to maintain the integrity, accuracy, and consistency of the data stored in the databasecommon types of constraints in SQL Server:
-Primary Key Constraint,Foreign Key Constraint, Unique Constraint (allow one null value),Check Constraint, Default Constraint.  
+**Constrain** **`created on the level of tables`**.It is a rule or condition applied to a set of columns in a table to maintain the integrity, accuracy, and consistency of the data stored in the databasecommon types of constraints in SQL Server:
+- Primary Key Constraint    
+- Foreign Key Constraint
+- Unique Constraint (allow one null value)
+- Check Constraint
+- Default Constraint.  
 1- Can't be shared.   
 2- Applied on all data not on the new data only.   
 3- Can make multiple of constrain.   
