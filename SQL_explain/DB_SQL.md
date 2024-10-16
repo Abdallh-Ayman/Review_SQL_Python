@@ -808,10 +808,11 @@ The PARTITION BY clause is a powerful tool in SQL Server that allows you to perf
 WITH RankedEmployees AS (
   SELECT EmpID, EmpName, Department, EmpSalary,
          RANK() OVER (PARTITION BY Department ORDER BY EmpSalary DESC) AS EmpSalaryRank 
-  FROM tblEmployee
+  FROM tblEmployee )
+
 SELECT EmpID, EmpName, Department, EmpSalary
 FROM RankedEmployees
-WHERE EmpSalaryRank = 1  )
+WHERE EmpSalaryRank = 1  
  ```        
 **we can use select from select(subqueries) instead of CTEs**
 ```sql
@@ -991,6 +992,7 @@ VALUES
         CUME_DIST() OVER (PARTITION BY CustomerID ORDER BY OrderTotal) AS CumulativeDistribution -- It counts how many orders have an OrderTotal that is less than or equal to 150.00. In this case, it’s just the one order itself. It then divides this count by the total number of orders. If there are three orders in total, it divides 1 by 3. so for the first row 150 = 1 /3
         from Orderss
     ```
+
     | OrderID | OrderDate  | CustomerID | OrderTotal | FirstOrderDate | LastOrderDate | RunningTotal | PricePercentRank | CumulativeDistribution |
     | ------- | ---------- | ---------- | ---------- | -------------- | ------------- | ------------ | ---------------- | ---------------------- |
     | 1       | 2024-01-10 | 101        | 150.00     | 2024-01-10     | 2024-03-15    | 150.00       | 0                | 0.333333333333333     |
@@ -1004,9 +1006,11 @@ VALUES
 
 -------
 ## CTEs, Function, Stored procedures , Views
+
 - **CTEs**   
- CTEs(veiw in memory) stands for Common Table Expressions, which is a temporary result set that is defined within the execution of a single SQL statement. In other words, CTEs allow you to create a named query that can be **referenced multiple times** within the same SQL statement **unlike the subquery** that can be referneced **one time**,So you can **reduce redundancy** using CTEs.CTEs are not functions in the sense that they do not take input parameters or return values, and they do not encapsulate a block of code that can be called from different parts of your code.  
- CTEs allow you to **simplify complex queries** by breaking them down into smaller, more manageable **readable** and **maintainable**. And increase the **performance**.
+    - CTEs(veiw in memory) stands for Common Table Expressions, which is a temporary result set that is defined within the execution of a single SQL statement. In other words, CTEs allow you to create a named query that can be **referenced multiple times** within the same SQL statement **unlike the subquery** that can be referneced **one time**, SO you can **reduce redundancy** using CTEs
+    - CTEs are not functions in the sense that they do not take input parameters or return values, and they do not encapsulate a block of code that can be called from different parts of your code.  
+    - CTEs allow you to **simplify complex queries** by breaking them down into smaller, more manageable **readable** and **maintainable**. And increase the **performance**.
  <img src="CTEs.png" width='650px' hight='650px' > 
 ```sql
  WITH my_cte AS (
