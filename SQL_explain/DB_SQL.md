@@ -264,6 +264,18 @@ DELETE can fire triggers, while TRUNCATE usually doesn't.
 ```sql
 DELETE FROM AUTHOR
 WHERE AUTHOR_ID IN ('A2', 'A3');  'or'
+
+-- Delete Using JOIN: Remove rows from one table based on related records in another table using a JOIN.
+DELETE e
+FROM Employees e
+JOIN Departments d ON e.department_id = d.department_id
+WHERE d.department_name = 'Sales';
+-- All employees who work in the "Sales" department will be deleted. The JOIN ensures that only related records are targeted.
+
+--Delete with OUTPUT: Capture the rows that are deleted and store them elsewhere for audit or logging purposes.
+DELETE FROM Employees
+OUTPUT DELETED.employee_id, DELETED.email INTO DeletedEmployees;
+-- The rows deleted from the Employees table are also inserted into the DeletedEmployees table for tracking.
 ```
 - **Merge** 
 In SQL Server, the MERGE statement is a powerful SQL operation that allows you to perform multiple DML (Data Manipulation Language) operations—such as INSERT, UPDATE, and DELETE—on a **target table** in a single statement, based on the comparison of the data in the target table with a **source table** or subquery. It's also known as an "upsert" operation, as it combines INSERT and UPDATE actions.
@@ -1327,6 +1339,61 @@ FROM Orders;
 
 ## 8. **NULL and Comparison Operators**
    When you perform comparison operations (`=`, `!=`, `>`, `<`, etc.) involving `NULL`, the result is always `NULL` (because `NULL` means unknown). To handle this, use the functions described above.
+
+## 9. **STRING_AGG**
+The `STRING_AGG` function is a powerful and flexible aggregation function introduced in SQL Server 2017 and later versions. It is used to concatenate values from multiple rows into a single string, with an optional delimiter between each value. This function simplifies scenarios where you need to combine multiple rows of data into a single, comma-separated (or other delimiter-separated) list.  
+#### Example:
+
+Consider a table `Orders`:
+
+| order_id | product      | customer_id |
+|----------|--------------|-------------|
+| 1        | Laptop       | 101         |
+| 2        | Mouse        | 101         |
+| 3        | Keyboard     | 102         |
+| 4        | Monitor      | 101         |
+
+You want to list the products purchased by each customer as a comma-separated string.
+
+```sql
+SELECT customer_id, STRING_AGG(product, ', ') AS Products
+FROM Orders
+GROUP BY customer_id;
+```
+
+**Output:**
+
+| customer_id | Products                |
+|-------------|-------------------------|
+| 101         | Laptop, Mouse, Monitor  |
+| 102         | Keyboard                |
+
+Here, `STRING_AGG` concatenates the `product` values for each `customer_id`, grouped by the `GROUP BY` clause.
+
+
+### 2. **Ordering the Results Inside `STRING_AGG`**
+
+By default, the values concatenated by `STRING_AGG` do not have a guaranteed order. However, you can specify the order by using the `WITHIN GROUP` clause.
+
+#### Example:
+
+Suppose you want to list the products purchased by each customer, but in alphabetical order.
+
+```sql
+SELECT customer_id, 
+       STRING_AGG(product, ', ') WITHIN GROUP (ORDER BY product) AS Products
+FROM Orders
+GROUP BY customer_id;
+```
+
+**Output:**
+
+| customer_id | Products                |
+|-------------|-------------------------|
+| 101         | Laptop, Monitor, Mouse  |
+| 102         | Keyboard                |
+
+Here, the `WITHIN GROUP (ORDER BY product)` ensures that the `product` values are concatenated in alphabetical order.
 
 
 ----
