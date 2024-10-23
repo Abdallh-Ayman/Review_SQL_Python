@@ -88,20 +88,8 @@ heterogeneous_list = [1, 'two', 3.0, True]
     letters = ['a', 'b', 'c']
     numbers = [1, 2]
     zipped = list(zip(letters, numbers))  # Combines elements from both lists into tuples  [('a',1),('b',2)]
-    
-    # Unpacking
-    listt= [1,2,3,4,5]  # Unpacking list must be the same number of the list
-    frist,second,*remain=listt
-    print(frist,second,remain)
-    # Output >> 1 2 [3, 4, 5]
-    #we can use unpacking operator to make list or combine two list in the new list
-    First=[1,2]
-    Second=[3,4,5]
-    values =[*first, "a", *second]
-    print(values)
-    # >> Output= [1,2,"a",3,4,5]
 
-    #enumerate() ->it add counter for iterable when making for loop
+    #enumerate() ->it add index(counter) for iterable when making for loop
     for index, value in enumerate(my_list):  # Iterates over each element with its index  ((0,'a'),(1,'b')...)
         print(index, value)             
 .   #it also delete the elements from enumerate tuples not the object as it fetch all element for the variable
@@ -113,7 +101,19 @@ heterogeneous_list = [1, 'two', 3.0, True]
     items =list(l1_enum)
     print(items) # it will be empty
     
-
+    # Unpacking
+    listt= [1,2,3,4,5]  # Unpacking list must be the same number of the list
+    frist,second,*remain=listt
+    print(frist,second,remain)
+    # Output >> 1 2 [3, 4, 5]
+    #we can use unpacking operator to make list or combine two list in the new list
+    First=[1,2]
+    Second=[3,4,5]
+    values =[*first, "a", *second]
+    print(values)
+    # >> Output= [1,2,"a",3,4,5]  # as * operator unpack the elements
+   
+ 
     filtered_list = list(filter(lambda x: x % 2 == 0, my_list))  # Filters elements based on a condition
     mapped_list = list(map(lambda x: x * 2, my_list))  # Applies a function to each element of the list
     from functools import reduce
@@ -283,10 +283,22 @@ my_dict.clear()      # Removing all key-value pairs from the dictionary
 # Dictionary Methods
 keys = my_dict.keys()     # Returns a view of keys in the dictionary as list
 values = my_dict.values() # Returns a view of values in the dictionary as list
+value = my_dict.get('key', 'default_value')  # Returns the value for 'key' if it exists, otherwise returns 'default_value'
 items = my_dict.items()   # Returns a view of key-value pairs (tuples) in the dictionary
 copied_dict = my_dict.copy()  # Creates a shallow copy of the dictionary
 other_dict = {'key4': 'value4', 'key5': 'value5'}
 my_dict.update(other_dict)    # Merges other_dict into my_dict, overwriting existing keys
+length = len(my_dict)   # Returns the number of key-value pairs in the dictionary
+is_present = 'key1' in my_dict   # Returns True if 'key1' is present in the dictionary
+
+#join
+myDict= {"name": "John", "country": "Norway"}
+mySeparator = "TEST"
+x = mySeparator.join(myDict)
+# More Advanced Techniques and Functions
+keys = ['a', 'b', 'c']
+values = [1, 2, 3]
+combined_dict = dict(zip(keys, values))  # Creates a dictionary from two lists
 
 #unpacking example
 myUltimateSkills ={"HTML":{"Main":"80%","Pugjs":"80%"},
@@ -302,19 +314,6 @@ for main_key,main_value in myUltimateSkills.items(): #.items it get all dict ite
     print(my_dict)
     Output= {'x':5,"y":4,"z":3}
 
-
-# Additional Dictionary Functions
-length = len(my_dict)   # Returns the number of key-value pairs in the dictionary
-is_present = 'key1' in my_dict   # Returns True if 'key1' is present in the dictionary
-value = my_dict.get('key', 'default_value')  # Returns the value for 'key' if it exists, otherwise returns 'default_value'
-#join
-myDict= {"name": "John", "country": "Norway"}
-mySeparator = "TEST"
-x = mySeparator.join(myDict)
-# More Advanced Techniques and Functions
-keys = ['a', 'b', 'c']
-values = [1, 2, 3]
-combined_dict = dict(zip(keys, values))  # Creates a dictionary from two lists
 
 #group by
 from collections import ChainMap, defaultdict
