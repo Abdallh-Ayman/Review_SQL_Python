@@ -374,11 +374,75 @@ Json : it coud be all object into on list or one object contain list of object.
 2- To write data to a JSON file, you can use the json.dump() function. This function writes Python data to a file-like object. (convert python object to Json string)
      
 ```python
+   # json.dump >> Does not return anything; it writes the JSON output to the provided file-like object
     data ={'name':'John','age':30,'city':'New York'}
     with open('users.json','w') as f:
         json.dump(data,f)
-        
+
+     #  json.dumps >> convert python object to Json string so,it Returns the JSON data as a string    
     data_json =json.dumps(data)
     with open('users.json','w') as f:
         f.write(data_json)
  ```
+
+------
+# crawling
+
+## 1.using APIs
+
+### python code example 
+
+```python
+import json
+import requests
+
+while True:
+    part_number = input("please enter keyword you need : ")
+    # when i find the need api that contains the data i need in the network
+    # 1- right click on that api and then copy then Copy all as CURL (bash),  then go to postman click on import past this CURL , then you can choose GET Or any thing and you can use the api url from the postman
+  
+    url = f"https://www.noon.com/_next/data/bigalog-a192a309ade5161b21d4954e641eda20628175b1/egypt-en/search.json?q={part_number}&gclid=Cj0KCQjw4Oe4BhCcARIsADQ0csn46N9s8pBipkC31jb4PubCWSeIO3IzePJbQNPu6DEEUC2FrngxbO0aAlLlEALw_wcB&utm_campaign=C1000151432N_eg_en_web_performancemaxxmobilesxalwaysonx18082022_noon_web_c1000087l_remarketing_plassc_&utm_medium=cpc&utm_source=c1000087l&catalog=search"
+
+    payload = {}
+
+    #It helps simulate requests from a web browser, which can be crucial for accessing data on websites that restrict non-browser traffic to prevent scraping.
+    #Including specific headers like user-agent and x-nextjs-data can also help ensure your requests are accepted by servers and reduce the risk of your script being blocked or your IP address being banned.
+    headers = {
+      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+      'x-nextjs-data': '1'
+    }
+
+    try:
+        response = requests.request("GET", url, headers=headers,timeout=20)
+        #response = requests.request("GET", url, data=payload,timeout=20)
+        #data=payload , It allows you to send data to the server, which can be necessary for operations like submitting form data, performing actions that modify server-side data, or querying a database via a web interface.
+        #if you needed to send additional parameters via POST instead of in the URL, you would add them to payload
+
+        #This line converts the JSON string into a Python dictionary so it can be easily worked with in the code.
+        data = json.loads(response.text)
+        
+        products = data['pageProps']['catalog']['hits']
+        skus = [product['sku'] for product in products]
+        names = [product['name'] for product in products]
+        urls = [product['url'] for product in products]
+        brands = [product['brand'] for product in products]
+        prices = [product['price'] for product in products]
+        sales_prices = [product['sale_price'] for product in products]
+        docs = [
+            {
+                'sku': sku,
+                'name': name,
+                'url': url,
+                'brand': brand,
+                'price': price,
+                'sale_price': sale_price
+            }
+            for sku, name, url, brand, price, sale_price in zip(skus, names, urls, brands, prices, sales_prices)
+        ]
+        print(len(skus))
+
+        #convert python object to Json string
+        print(json.dumps(docs, indent=4))
+    except Exception as e:
+        print(e)
+```
