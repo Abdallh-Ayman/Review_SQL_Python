@@ -424,8 +424,72 @@ Let’s go through the most common stages in the pipeline:
    - This stage works like a `WHERE` clause in SQL, limiting the data to only what’s relevant.
 
 2. **`$group`**: Groups documents together to perform calculations, like sums or averages.
-   - Example: `{ $group: { _id: "$category", total: { $sum: "$amount" } } }`
-   - This stage is like `GROUP BY` in SQL and is useful for aggregating data (e.g., total sales per category).
+    #### Basic Syntax
+    ```javascript
+    db.collection.aggregate([
+      { 
+        $group: { 
+          _id: <expression>,           // Specifies the field(s) to group by
+          <field1>: { <accumulator1> }, // Defines aggregated fields and accumulators
+          <field2>: { <accumulator2> }
+        } 
+      }
+    ])
+    ```
+
+    - **`_id`**: This field represents the grouping key. It can be a single field, multiple fields, or even an expression. Using `null` as `_id` groups all documents into a single group.
+    - **Accumulator Expressions**: These are functions that calculate values for each group, such as `$sum`, `$avg`, `$min`, `$max`, `$push`, and `$addToSet`.
+
+    ### Common Accumulator Operators
+
+    - **`$sum`**: Calculates the total sum of a field within each group.
+    - **`$avg`**: Calculates the average of a field.
+    - **`$min`** / **`$max`**: Finds the minimum or maximum value of a field.
+    - **`$push`**: Adds values to an array for each group.
+    - **`$addToSet`**: Adds unique values to an array for each group (like a set).
+
+    ### Example of `$group`
+
+
+    Let’s say you have a `sales` collection with documents like this:
+
+    ```javascript
+    { item: "apple", quantity: 5, price: 10 }
+    { item: "banana", quantity: 7, price: 15 }
+    { item: "apple", quantity: 3, price: 10 }
+    ```
+
+    To find the total quantity sold for each item:
+
+    ```javascript
+    db.sales.aggregate([
+      { 
+        $group: { 
+          _id: "$item",                             // Group by `item`
+          totalRevenue: { $sum: { $multiply: ["$price", "$quantity"] } }, // Calculates total revenue
+          avgPrice: { $avg: "$price" }              // Calculates average price
+        } 
+      }
+    ])
+    // result 
+    { _id: "apple", totalRevenue: 80, avgPrice: 10 }
+    { _id: "banana", totalRevenue: 105, avgPrice: 15 }
+
+
+    // OR group all documnet together 
+    db.sales.aggregate([
+      { 
+        $group: { 
+          _id: null,                       // Group all documents together
+          totalQuantity: { $sum: "$quantity" }
+        } 
+      }
+    ])
+
+    // result 
+    { _id: null, totalQuantity: 15 }
+
+    ```
 
 3. **`$project`**: Selects specific fields to include or exclude in the results, or creates new fields.
    - Example: `{ $project: { name: 1, total: 1, avgScore: { $avg: "$scores" } } }`
@@ -470,7 +534,7 @@ db.products.aggregate([
 
 
 ### 7. **`$unwind`** 
-It breaks down an array field into multiple documents, each containing one element from the array.
+- It breaks down an array field into multiple documents, each containing one element from the array.
 ### Example
 
 Suppose we have a `posts` collection, and each post has a `comments` array with multiple comments:
