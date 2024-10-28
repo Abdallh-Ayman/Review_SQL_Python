@@ -424,6 +424,7 @@ Let’s go through the most common stages in the pipeline:
    - This stage works like a `WHERE` clause in SQL, limiting the data to only what’s relevant.
 
 2. **`$group`**: Groups documents together to perform calculations, like sums or averages.
+
     #### Basic Syntax
     ```javascript
     db.collection.aggregate([
@@ -534,111 +535,301 @@ db.products.aggregate([
 
 
 ### 7. **`$unwind`** 
-- It breaks down an array field into multiple documents, each containing one element from the array.
-### Example
-
-Suppose we have a `posts` collection, and each post has a `comments` array with multiple comments:
-
-```javascript
-{
+  - It breaks down an array field into multiple documents, each containing one element from the array.
+  
+  ### Example
+  Suppose we have a `posts` collection, and each post has a `comments` array with multiple comments:
+  ```javascript
+  {
   title: "Post One",
   comments: [
-    { user: "Alice", body: "Great post!" },
-    { user: "Bob", body: "Very informative." }
+  { user: "Alice", body: "Great post!" },
+  { user: "Bob", body: "Very informative." }
   ]
-}
-```
-
-If we run:
-
-```javascript
-db.posts.aggregate([
+  }
+  ```
+  If we run:
+  ```javascript
+  db.posts.aggregate([
   { $unwind: "$comments" }
-])
-```
-
-### Result
-
-This will transform the document with multiple comments into separate documents, like this:
-
-```javascript
-{
+  ])
+  ```
+  ### Result
+  This will transform the document with multiple comments into separate documents, like this:
+  ```javascript
+  {
   title: "Post One",
   comments: { user: "Alice", body: "Great post!" }
-}
-{
+  }
+  {
   title: "Post One",
   comments: { user: "Bob", body: "Very informative." }
-}
-```
-### Practical Use Cases for `$unwind`
-- **Analyzing Individual Array Elements**: For example, if each document represents an order with an array of items, `$unwind` lets you analyze each item independently.
-- **Filtering Array Elements**: After unwinding, you can apply filters to work with specific elements within arrays.
-- **Grouping and Aggregating**: Use `$unwind` before `$group` to perform aggregations on each element within an array (e.g., counting occurrences of each item type across all orders).
-
-### Advanced Usage with $unwind
-```javascript
-{ 
-  $unwind: { 
-    path: "$comments",           // The array field to unwind
-    preserveNullAndEmptyArrays: true  // Optional: keeps documents without the array
   }
-}
-```
+  ```
+  ### Practical Use Cases for `$unwind`
+  - **Analyzing Individual Array Elements**: For example, if each document represents an order with an array of items, `$unwind` lets you analyze each item independently.
+  - **Filtering Array Elements**: After unwinding, you can apply filters to work with specific elements within arrays.
+  - **Grouping and Aggregating**: Use `$unwind` before `$group` to perform aggregations on each element within an array (e.g., counting occurrences of each item type across all orders).
 
-- **`path`**: Specifies the array field to unwind.
-- **`preserveNullAndEmptyArrays`**: When set to `true`, it keeps documents without the array field or with an empty array, returning them as they are.
-
-### Example Scenario
-
-Suppose you have the following documents in the `posts` collection:
-
-```javascript
-{
+  ### Advanced Usage with $unwind
+  ```javascript
+  { 
+  $unwind: { 
+  path: "$comments",           // The array field to unwind
+  preserveNullAndEmptyArrays: true  // Optional: keeps documents without the array
+  }
+  }
+  ```
+  - **`path`**: Specifies the array field to unwind.
+  - **`preserveNullAndEmptyArrays`**: When set to `true`, it keeps documents without the array field or with an empty array, returning them as they are.
+  ### Example Scenario
+  Suppose you have the following documents in the `posts` collection:
+  ```javascript
+  {
   title: "Post One",
   comments: [
-    { user: "Alice", body: "Great post!" },
-    { user: "Bob", body: "Very informative." }
+  { user: "Alice", body: "Great post!" },
+  { user: "Bob", body: "Very informative." }
   ]
-},
-{
+  },
+  {
   title: "Post Two",
   comments: []  // Empty comments array
-},
-{
+  },
+  {
   title: "Post Three"
   // No comments field
-}
-```
-
-Using this pipeline:
-
-```javascript
-db.posts.aggregate([
-  {
-    $unwind: {
-      path: "$comments",
-      preserveNullAndEmptyArrays: true
-    }
   }
-])
-```
-### Result
-```js
-{
+  ```
+
+  Using this pipeline:
+
+  ```javascript
+  db.posts.aggregate([
+  {
+  $unwind: {
+    path: "$comments",
+    preserveNullAndEmptyArrays: true
+  }
+  }
+  ])
+  ```
+  ### Result
+  ```js
+  {
   title: "Post One",
   comments: { user: "Alice", body: "Great post!" }
-}
-{
+  }
+  {
   title: "Post One",
   comments: { user: "Bob", body: "Very informative." }
-}
-{
+  }
+  {
   title: "Post Two",
   comments: []  // Preserved as-is because of `preserveNullAndEmptyArrays: true`
-}
-{
+  }
+  {
   title: "Post Three"
   // Preserved as-is because of `preserveNullAndEmptyArrays: true`
+  }
+  ```
+
+  ### another Example
+  - answer this question >> What is the average number of tags per user?  
+  ```js
+  {
+  index: 0
+  name: "Aurelia Gonzales"
+  isActive: false
+  registered: 2015-02-11T04:22:39.000+00:00
+  age: 20
+  gender: "female"
+  eyeColor: "green"
+  favoriteFruit: "banana"
+  company: Object
+  tags: Array(5)
+  }
+  // first method using unwind
+  [
+  {
+  $unwind: "$tags"
+  },
+  {
+  $group: {
+    _id: "$_id",
+    numberOfTags: { $sum: 1 }
+  }
+  },
+  {
+  $group: {
+    _id: null,
+    averageNumberOfTags: { $avg: "$numberOfTags" }
+  }
+  }
+  ]
+
+  // second method add new field 
+  [
+  {
+  $addFields: {
+    numberOfTags: {
+      $size: { $ifNull: ["$tags", []] }
+    }
+  }
+  }
+  ]
+  // $ifNull: Checks if tags is null or missing. If tags is null, it substitutes an empty array [], ensuring $size always has an array to count.
+
+  ```
+
+### 8. **`$Push`** 
+
+- It add elements to an array field. It "pushes" a value (or values) onto the end of an array, allowing you to append data to existing arrays in documents.
+
+  #### Example 
+
+  ```js
+  // If the document is initially:
+  { title: "Post One", tags: ["tag1", "tag2"] }
+
+  db.posts.update(
+    { title: "Post One" },          // Filter to find the document
+    { $push: { tags: "newTag" } }   // Pushes "newTag" into the `tags` array
+  )
+
+  // After the $push operation, it becomes:
+  { title: "Post One", tags: ["tag1", "tag2", "newTag"] }
+
+  //////////////////////////////////////////////////////////////////////
+
+  // Using $push with Multiple Values ($each)
+  db.posts.update(
+    { title: "Post One" },
+    { $push: { tags: { $each: ["tag3", "tag4"] } } }
+  )
+  //result
+  { title: "Post One", tags: ["tag1", "tag2", "tag3", "tag4"] }
+
+  // Using $push in an Aggregation Pipeline  $push is often used with $group to gather items into an array for each group.
+  { customerId: 1, item: "apple" }
+  { customerId: 1, item: "banana" }
+  { customerId: 2, item: "orange" }
+  { customerId: 1, item: "grape" }
+
+  db.sales.aggregate([
+    {
+      $group: {
+        _id: "$customerId",
+        itemsBought: { $push: "$item" }
+      }
+    }
+  ])
+
+  //result 
+  {
+    _id: 1,
+    itemsBought: ["apple", "banana", "grape"]
+  }
+  {
+    _id: 2,
+    itemsBought: ["orange"]
+  }
+  ```
+
+  ### 9. **`$lookup`**
+
+  - It to perform a left outer join with another collection. It allows you to combine documents from one collection with documents from another collection based on a specified condition. This is similar to an SQL JOIN operation.
+```JS
+// Syntax 
+{
+  $lookup: {
+    from: "<foreignCollection>", //The name of the other collection (foreign collection) to join with.
+    localField: "<localField>", //The field in the current (local) collection that you want to match with the foreign collection.
+    foreignField: "<foreignField>", //The field in the foreign collection to match with localField.
+    as: "<outputField>" //The name of the new field that will hold the array of matched documents from the foreign collection
+  }
 }
 ```
+### Example 
+Let’s say we have two collections, `orders` and `customers`, and we want to join them.
+
+  ```javascript
+
+    // orders Collection
+  { _id: 1, customerId: 101, amount: 250 }
+  { _id: 2, customerId: 102, amount: 300 }
+  { _id: 3, customerId: 103, amount: 150 }
+
+  // customers  Collection
+  { _id: 101, name: "Alice" }
+  { _id: 102, name: "Bob" }
+  { _id: 104, name: "Charlie" }
+
+  //If we want to add customer information to each order based on `customerId`, we can use `$lookup` as follows:
+  db.orders.aggregate([
+    {
+      $lookup: {
+        from: "customers",           // The foreign collection to join
+        localField: "customerId",     // Field from the `orders` collection
+        foreignField: "_id",          // Field from the `customers` collection
+        as: "customerInfo"            // Output field to store matched documents
+      }
+    }
+  ])
+
+  // Result 
+  [
+    {
+      _id: 1,
+      customerId: 101,
+      amount: 250,
+      customerInfo: [
+        { _id: 101, name: "Alice" }
+      ]
+    },
+    {
+      _id: 2,
+      customerId: 102,
+      amount: 300,
+      customerInfo: [
+        { _id: 102, name: "Bob" }
+      ]
+    },
+    {
+      _id: 3,
+      customerId: 103,
+      amount: 150,
+      customerInfo: []  // No matching document in `customers`, so array is empty
+    }
+  ]
+  ```
+### Advanced Usage with `$lookup`
+
+The `$lookup` operator also has additional options that allow for more complex joins, such as:
+
+1. **Pipeline-based Join** (`let` and `pipeline`):
+   - Allows for more complex matching and transformations using aggregation pipeline stages on the foreign collection.
+   - Example:
+     ```javascript
+     db.orders.aggregate([
+       {
+         $lookup: {
+           from: "customers",
+           let: { orderCustomerId: "$customerId" },
+           pipeline: [
+             { $match: { $expr: { $eq: ["$customerId", "$$orderCustomerId"] } } },
+             { $project: { name: 1, _id: 0 } }
+           ],
+           as: "customerInfo"
+         }
+       }
+     ])
+     ```
+   - **`let`** defines variables from the `orders` collection that can be used in the `pipeline`.
+   - **`pipeline`** defines stages to apply on the `customers` collection, with `$expr` enabling the use of variables in conditions.
+
+2. **Unwinding the Results**:
+   - If you expect only one match or want to work with individual matched documents, use `$unwind` on the `as` field to convert the array into individual documents.
+
+
+
