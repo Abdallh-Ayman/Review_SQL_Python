@@ -446,3 +446,93 @@ while True:
     except Exception as e:
         print(e)
 ```
+
+## 2.using XPATH
+
+- **quote**   
+    - The `quote` function from the `urllib.parse` module in Python is used to safely encode special characters in URLs.  
+    - This function is crucial for web applications dealing with dynamic URLs that include user-generated content, helping to prevent URL manipulation and ensuring compatibility across different web servers and clients. 
+    - The function is typically used to encode URL parameters to ensure they are valid URLs, especially when they might contain characters that are illegal in standard URL formats.
+    ### Function Signature
+    ```python
+    urllib.parse.quote(string, safe='/', encoding=None, errors=None)
+    ```
+
+    ### Parameters
+    - **string**: The text to be URL-encoded.
+    - **safe**: Characters that should not be encoded. Default is `'/'`, which is common in URLs.
+    - **encoding**: Character encoding to use. If none is specified, UTF-8 is used.
+    - **errors**: Error handling strategy for characters that can't be converted with the specified encoding.
+
+    ### Example
+    ```python
+    from urllib.parse import quote
+
+    # A typical example where the user input might contain spaces or special characters
+    user_input = "hello world & good day"
+    safe_url_part = quote(user_input)
+
+    print(safe_url_part)  # Output: hello%20world%20%26%20good%20day
+    ######################################################################################
+
+    url_part = "hello world"
+    encoded_part = quote(url_part)
+    print(encoded_part)  # Output: hello%20world
+
+    # If you were to pass safe=' ' to quote, the space would not be encoded:
+    encoded_part = quote(url_part, safe=' ')
+    print(encoded_part)  # Output: hello world
+
+
+    ```
+    In this example:
+    - The space characters and the ampersand (`&`) are encoded to `%20` and `%26` respectively.
+    - The output ensures the string can be safely used as part of a URL.
+
+
+
+```py
+
+import requests
+from bs4 import BeautifulSoup
+from lxml import etree
+from urllib.parse import quote
+
+# Setup
+# Define the part number to search for
+url_part = "R-78E5.0-0.5"
+# Create the full URL for the request, ensuring special characters in the part number are properly encoded
+source_url = 'https://www.findchips.com/search/' + quote(url_part, safe='') + '?currency=USD'
+# Set up HTTP headers if necessary (e.g., User-Agent, Authentication)
+headers = {
+    # Specify necessary headers here, like 'User-Agent': 'MyApp/1.0'
+}
+
+
+
+# Making a request
+# Perform an HTTP GET request with the specified URL and headers
+response = requests.get(source_url, headers=headers)
+# Check if the HTTP request was successful
+if response.status_code == 200:
+    # Get the text content of the response
+    html_content = response.text
+    # Parse the HTML content with BeautifulSoup
+    soup = BeautifulSoup(html_content, "html.parser")
+    # Convert the BeautifulSoup object to a string and parse it with lxml(convert HTML to XML) for XPath querying
+    dom = etree.HTML(str(soup))
+
+
+
+    # Extracting data
+    # Use XPath to find all div elements with class 'distributor-results'
+    sellers = dom.xpath("//div[@class='distributor-results']")
+    # Loop through each seller div and print the 'data-distributor_name' attribute
+    for seller in sellers:
+        print(seller.attrib['data-distributor_name'])
+else:
+    # If the status code is not 200, print an error message including the status code
+    print(f"Failed to retrieve data, status code: {response.status_code}")
+
+```
+
