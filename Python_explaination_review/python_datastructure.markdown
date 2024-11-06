@@ -536,3 +536,75 @@ else:
 
 ```
 
+-----------------
+
+# Python MULTITHREADING 
+- **multithreading**: Used to perform multiple tasks concurrently (multitasking)
+- Good for I/O bound tasks like reading files or fetching data from APIs
+- threading.Thread(target=my_function)
+
+```py
+    # without threading (it will executed one by one it run in one thread in the main file ) 
+
+    def walk_dog(first, last):
+    time.sleep(8)
+    print(f"You finish walking {first} {last}")
+
+    def take_out_trash():
+    time.sleep(2)
+    print("You take out the trash")
+
+    def get_mail():
+    time.sleep(4)
+    print("You get the mail")
+
+    walk_dog("Scooby", "Doo")
+    take_out_trash()
+    get_mail()
+    # output 
+    '''You finish walking Scooby Doo 
+       You take out the trash
+        You get the mail  '''
+
+
+    #using threading (to make the functions run at the same time divide it into threading to run in parallel  )
+
+    import threading
+    import time
+
+    def walk_dog(first, last):
+    time.sleep(8)
+    print(f"You finish walking {first} {last}")
+
+    def take_out_trash():
+    time.sleep(2)
+    print("You take out the trash")
+
+    def get_mail():
+    time.sleep(4)
+    print("You get the mail")
+
+    chore1 = threading.Thread(target=walk_dog, args=("Scooby", "Doo"))
+    chore1.start()
+
+    chore2 = threading.Thread(target=take_out_trash)
+    chore2.start()
+
+    chore3 = threading.Thread(target=get_mail)
+    chore3.start()
+
+    ## .join() ensures that all tasks are completed before proceeding
+    chore1.join()
+    chore2.join()
+    chore3.join()
+
+    print("All chores are complete!")
+
+        # output 
+    '''You take out the trash
+       You get the mail
+       You finish walking Scooby Doo 
+       All chores are complete!
+          '''
+
+```

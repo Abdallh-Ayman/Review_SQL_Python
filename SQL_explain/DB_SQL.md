@@ -1396,6 +1396,8 @@ GROUP BY customer_id;
 Here, the `WITHIN GROUP (ORDER BY product)` ensures that the `product` values are concatenated in alphabetical order.
 
 
+## 10. **STRING_AGG**
+
 ----
 
 ## **Stored procedures** 
