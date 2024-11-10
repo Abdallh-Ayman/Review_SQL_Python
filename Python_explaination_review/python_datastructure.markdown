@@ -608,3 +608,122 @@ else:
           '''
 
 ```
+#### yield Function
+- Unlike regular functions that return all values at once (storing them in memory), yield produces **one result at a time**, consuming less memory.
+- the function’s execution state (including local variables and the execution point) is saved. The next time the generator is called, it resumes right where it left off.
+- Functions with yield only execute and produce the next item when you ask for it, which is why they are called "lazy evaluation."
+```Python
+    def count_up_to(max):
+        count = 1
+        while count <= max:
+            yield count  # It stop here to return one value if it called again it resumes right where it left off here.
+            count += 1
+    
+    counter = count_up_to(3)  # the counter vairable is generator object 
+    print(next(counter))  # Output: 1
+    print(next(counter))  # Output: 2
+    print(next(counter))  # Output: 3
+    print(next(counter))  # This will raise a StopIteration exception because the generator is exhausted.
+ 
+    
+
+    # or you want to create a generator that yields squared values of numbers in a list:
+    def squares(numbers):
+    for number in numbers:
+        yield number ** 2
+
+    # Using the generator
+    for square in squares([1, 2, 3, 4]):
+        print(square)
+    ''' output
+        1
+        4
+        9
+        16
+    '''
+
+
+    # yield can also be used to create more complex data flows, such as handling nested loops or conditionals:
+    def flatten(nested_list):
+    for sublist in nested_list:
+        if isinstance(sublist, list):
+            for item in sublist:
+                yield item
+        else:
+            yield sublist
+
+    nested = [1, [2, 3], 4, [5, [6, 7]]]
+    for num in flatten(nested):
+        print(num)
+
+    ''' output
+        1
+        2
+        3
+        4
+        5
+        [6, 7]
+
+    '''
+
+
+```
+### Real_Example
+```py
+     # you can add script parameter to the python script that will not run until you give this parameter to this python script 
+     # sys.argv >>>> This is a list in Python that contains the command-line arguments passed to the script.
+     # sys.argv[0] >>>> always the script's filename
+     # sys.argv[1] >>>> the first argument passed to the script.
+     #  if the input was  "10,20,30" >> [10, 20, 30]
+
+    loads = [int(load) for load in sys.argv[1].split(',')]  # this list will contains the argument as integer seperated with ,  
+    query = {'task_name': 'FDH_Electronic', 'args': loads}
+    documents = server_tasks_coll.find(query)
+    task_doc = next(documents)
+
+    def divide_batches(all_input):
+    try:
+        n = int(math.ceil(len(all_input) / number_of_threads))
+        for i in range(0, len(all_input), n):
+            yield all_input[i:i + n]
+    except Exception as Batches_err:
+        print("Error during dividing Input to Batches input : {}".format(Batches_err))
+
+        while True:
+        try:
+            RSPartial = list(input_coll.find(mongo_filter).limit(mongo_limit))
+
+            if len(RSPartial) >= 0:
+                server_tasks_coll.update_one({'_id': task_doc['_id']},
+                                             {'$set': {"IsRunning": True, "issue": None,
+                                                       "last_run_date": datetime.datetime.now().strftime(
+                                                           "%d/%m/%Y %H:%M:%S")}})
+                # result = chunk_list(RSPartial, 1)
+
+                batches = divide_batches(RSPartial)
+                all_threads = []
+                for batch in batches:
+                    thread = threading.Thread(target=Engine, args=(batch, input_coll, output_coll,))
+                    all_threads.append(thread)
+
+                for thread in all_threads:
+                    thread.start()
+                    
+                ## .join() ensures that all tasks are completed before proceeding
+                for j in all_threads:
+                    j.join()
+
+            else:
+                print("No Pending Data")
+
+                server_tasks_coll.update_one({'_id': task_doc['_id']},
+                                             {'$set': {"IsRunning": False, "issue": "No Pending Data"}})
+
+                time.sleep(60)
+                continue
+        except Exception as ex:
+            print(ex)
+            server_tasks_coll.update_one({'_id': task_doc['_id']},
+                                         {'$set': {"IsRunning": False, "issue": str(ex)}})
+            pass
+```
