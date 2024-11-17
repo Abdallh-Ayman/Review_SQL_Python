@@ -1396,9 +1396,83 @@ GROUP BY customer_id;
 Here, the `WITHIN GROUP (ORDER BY product)` ensures that the `product` values are concatenated in alphabetical order.
 
 
-## 10. **STRING_AGG**
+## 10. **PIVOT **
+```SQL
+    -- Basic Syntax 
+    SELECT <non-pivoted column>,
+        [first pivoted column] AS <column name>,
+        [second pivoted column] AS <column name>,
+        ...
+    FROM
+        (<SELECT query that produces the data>)
+        AS <alias for the source query>
+    PIVOT
+        (
+            <aggregation function>(<column being aggregated>)
+            FOR <column that contains the values that will become column headers>
+            IN ([first pivoted column], [second pivoted column], ...)
+        ) AS <alias for the pivot table>     
 
-----
+```
+
+Sure! In SQL Server, the `PIVOT` operator is used to transform rows into columns, effectively turning unique data values from one column into multiple columns in the output. This can be particularly useful when you need to create a cross-tabulation or summary table from a detailed dataset.
+
+### How PIVOT Works
+1. **Source Table**: You start with a table or a result set that typically includes rows with repetitive data that you want to summarize or reformat into a more readable structure.
+2. **Aggregation**: PIVOT uses an aggregate function (like SUM, AVG, MAX, MIN, COUNT) to merge similar data into a single row and spread other related data across columns.
+3. **Column Transformation**: It converts unique values from one column in the original data set into multiple columns in the output, with each column representing a unique value.
+4. **Specified Values**: You need to specify which column's values to transform into columns and which column to aggregate.
+
+### Basic Syntax
+```sql
+SELECT <non-pivoted column>,
+    [first pivoted column] AS <column name>,
+    [second pivoted column] AS <column name>,
+    ...
+FROM
+    (<SELECT query that produces the data>)
+    AS <alias for the source query>
+PIVOT
+    (
+        <aggregation function>(<column being aggregated>)
+        FOR <column that contains the values that will become column headers>
+        IN ([first pivoted column], [second pivoted column], ...)
+    ) AS <alias for the pivot table>
+```
+
+### Example: PIVOT Operation
+Suppose you have a sales table `SalesData` that records sales amounts for different products across various months.
+
+**SalesData Table**
+| ProductName | Month   | SalesAmount |
+|-------------|---------|-------------|
+| Widget      | January | 1000        |
+| Widget      | February| 1500        |
+| Gadget      | January | 1200        |
+| Gadget      | February| 1700        |
+
+You want to pivot this table to show each product along with separate columns for sales in January and February.
+
+#### SQL Query Using PIVOT
+```sql
+SELECT ProductName, [January], [February]
+FROM
+   (SELECT ProductName, Month, SalesAmount
+    FROM SalesData) AS SourceTable
+PIVOT
+   (
+    SUM(SalesAmount)
+    FOR Month IN ([January], [February])
+   ) AS PivotTable;
+```
+
+**Result**  
+| ProductName | January | February |
+|-------------|---------|----------|
+| Widget      | 1000    | 1500     |
+| Gadget      | 1200    | 1700     |
+
+
 
 ## **Stored procedures** 
 

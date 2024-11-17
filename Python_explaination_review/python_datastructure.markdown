@@ -370,8 +370,47 @@ Json : it coud be all object into on list or one object contain list of object.
     Import json
     with open('data.json') as f :
         data =json.load(f)
+    
+    def load_config():
+        root_path = os.path.dirname(os.path.realpath(sys.argv[0]))
+        file_path = os.path.join(root_path, 'config.json')
+        input_file = open(file_path)
+        json_data = json.load(input_file)
+        return json_data
+
 ```
-2- To write data to a JSON file, you can use the json.dump() function. This function writes Python data to a file-like object. (convert python object to Json string)
+
+1. **`root_path = os.path.dirname(os.path.realpath(sys.argv[0]))`**
+
+   - **`sys.argv[0]`**: 
+     - `sys.argv` is a list in Python that contains command-line arguments passed to the script.
+     - `sys.argv[0]` specifically refers to the path of the script being executed (essentially, where the current Python file is located).
+   - **`os.path.realpath(sys.argv[0])`**:
+     - `os.path.realpath()` resolves the absolute path of the file, converting any symbolic links (shortcuts) or relative paths to the full, absolute path.
+     - For example, if `sys.argv[0]` is `"./script.py"`, then `os.path.realpath(sys.argv[0])` will return something like `"/home/user/project/script.py"`.
+   - **`os.path.dirname()`**:
+     - `os.path.dirname()` extracts the directory part of a given path, removing the file name.
+     - Here, it removes `"script.py"` from the path, resulting in `"/home/user/project"`.
+   - **Result**:
+     - After these functions are combined, `root_path` will hold the directory path where the script is located. In this example, `root_path` will be `"/home/user/project"`.
+
+   **Summary of Line 1**: This line calculates the directory path of the current Python script and assigns it to `root_path`.
+
+2. **`file_path = os.path.join(root_path, 'config.json')`**
+
+   - **`os.path.join(root_path, 'config.json')`**:
+     - `os.path.join()` is a function that safely combines directory and file paths in a platform-independent way (Windows, Linux, macOS) by adding the appropriate separator (e.g., `/` or `\`).
+     - Here, it joins `root_path` (the directory where the script is located) with `'config.json'`.
+     - If `root_path` is `"/home/user/project"`, the result will be `"/home/user/project/config.json"`.
+   - **Result**:
+     - `file_path` now holds the full path to the `config.json` file in the same directory as the script, regardless of the operating system or specific location of the script.
+
+   **Summary of Line 2**: This line constructs the full path to `config.json`, which is assumed to be in the same directory as the script, and assigns it to `file_path`.
+
+#### Example Scenario
+If the script is located in `"/home/user/project/"`, the two lines would work as follows:
+- `root_path` will be `"/home/user/project"`.
+- `file_path` will then be `"/home/user/project/config.json"`.
      
 ```python
    # json.dump >> Does not return anything; it writes the JSON output to the provided file-like object
@@ -672,7 +711,7 @@ else:
 ```py
      # you can add script parameter to the python script that will not run until you give this parameter to this python script 
      # sys.argv >>>> This is a list in Python that contains the command-line arguments passed to the script.
-     # sys.argv[0] >>>> always the script's filename
+     # sys.argv[0] >>>> always the script's filename path
      # sys.argv[1] >>>> the first argument passed to the script.
      #  if the input was  "10,20,30" >> [10, 20, 30]
 
@@ -708,7 +747,7 @@ else:
 
                 for thread in all_threads:
                     thread.start()
-                    
+
                 ## .join() ensures that all tasks are completed before proceeding
                 for j in all_threads:
                     j.join()
