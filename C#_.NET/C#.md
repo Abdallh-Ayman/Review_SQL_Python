@@ -72,8 +72,8 @@ static void Main(string[] args)
 {
 
 
-    // Creating an instance of the Calculator class
-    Calculator myCalculator = new Calculator();
+    // you should Creating an instance of the Calculator class
+    Calculator myCalculator = new Calculator(); 
     // Calling the instance method on the object
     int result = myCalculator.Add(5, 3);
     Console.WriteLine("Sum: " + result);
@@ -173,6 +173,158 @@ List<int> numbers = new List<int> { 1, 2, 3, 4 };
 int sum = numbers.FindAll(x => x > 2).Sum();
 ```
 
-### Conclusion
-Functions in C# are versatile tools that help you organize and manage your code effectively. They can perform tasks ranging from simple actions like displaying messages to complex calculations and data processing. Understanding how to use different types of functions and parameters will greatly enhance your ability to write robust and maintainable C# applications.
+
+
+# Basic Concepts of OOP in C#
+
+#### 1. **Classes and Objects**
+- **Class**: A blueprint for creating objects. A class defines a type of object according to the data it holds and the operations (methods) that it can perform.
+- **Object**: An instance of a class. Each object has a state (data) and behaviors (methods) defined by its class.
+
+**Example:**
+```csharp
+public class Dog
+{
+    // Fields (Data)
+    public string Name;
+    public string Breed;
+
+    // Method (Behavior)
+    public void Bark()
+    {
+        Console.WriteLine("Woof!");
+    }
+}
+
+// Creating an object of Dog class
+Dog myDog = new Dog();
+myDog.Name = "Buddy";
+myDog.Breed = "Golden Retriever";
+myDog.Bark(); // Output: Woof!
+```
+
+#### 2. **Encapsulation**
+- **Encapsulation** is the concept of bundling the data (variables) and methods that operate on the data into a single unit or class. It also restricts direct access to some of an object’s components, which can prevent the accidental modification of data.
+
+**Example:**
+```csharp
+public class Account
+{
+    private double balance;  // Private variable, encapsulated
+
+    public void Deposit(double amount)
+    {
+        if (amount > 0)
+        {
+            balance += amount;
+        }
+    }
+
+    public double GetBalance()
+    {
+        return balance;
+    }
+}
+
+public static void Main()
+    {
+        // Create an instance of the Account class
+        Account myAccount = new Account();
+
+        // Display initial balance
+        Console.WriteLine("Initial Balance: $" + myAccount.GetBalance());
+
+        // Deposit some money into the account
+        myAccount.Deposit(100.0);
+        Console.WriteLine("After depositing $100, the balance is: $" + myAccount.GetBalance());
+
+        // Try depositing a negative amount
+        myAccount.Deposit(-50.0); // This should not change the balance
+        Console.WriteLine("After trying to deposit -$50, the balance is: $" + myAccount.GetBalance());
+
+    }
+```
+
+#### 3. **Inheritance**
+- **Inheritance** allows a class to inherit properties and methods from another class. In C#, classes can inherit from one base class and multiple interfaces.
+
+**Example:**
+```csharp
+public class Animal
+{
+    public void Eat()
+    {
+        Console.WriteLine("Eating...");
+    }
+}
+
+public class Dog : Animal  // Dog inherits from Animal
+{
+    public void Bark()
+    {
+        Console.WriteLine("Woof!");
+    }
+}
+
+Dog myDog = new Dog();
+myDog.Eat(); // Output: Eating...
+myDog.Bark(); // Output: Woof!
+```
+
+#### 4. **Polymorphism**
+- **Polymorphism** allows methods to do different things based on the object it is acting upon. This means that a single method interface can have multiple implementations.
+
+**Example:**
+```csharp
+public class Animal
+{
+    public virtual void Speak()
+    {
+        Console.WriteLine("Some sound");
+    }
+}
+
+public class Dog : Animal
+{
+    public override void Speak()
+    {
+        Console.WriteLine("Woof!");
+    }
+}
+
+public class Cat : Animal
+{
+    public override void Speak()
+    {
+    Console.WriteLine("Meow!");
+    }
+}
+
+Animal myAnimal = new Dog();
+myAnimal.Speak(); // Output: Woof!
+myAnimal = new Cat();
+myAnimal.Speak(); // Output: Meow!
+```
+
+#### 5. **Abstraction**
+- **Abstraction** involves hiding the complex reality while exposing only the necessary parts. It is generally achieved using abstract classes and interfaces.
+
+**Example:**
+```csharp
+public abstract class Animal
+{
+    public abstract void Speak();
+}
+
+public class Dog : Animal
+{
+    public override void Speak()
+    {
+        Console.WriteLine("Woof!");
+    }
+}
+
+Dog myDog = new Dog();
+myDog.Speak(); // Output: Woof!
+```
 
