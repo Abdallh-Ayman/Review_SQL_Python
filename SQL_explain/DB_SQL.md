@@ -1955,6 +1955,9 @@ In summary, table statistics are a crucial part of the database's optimization p
    - if the **range** of search is very large (ex: between 1 and 2000) the optimizer could choose the whole table scan instead of the index scan as the index scan will scan alot of pages and could **scan the specific page multiple times** this could take more time than the whole table scan.and there is could be database that can store the page in there cashe so it doesn't need to make scan again.
    ```sql
    CREATE INDEX idx_example ON your_table(column1, column2);
+
+   SELECT * FROM Sales.Orders WHERE OrderStatus = 'Delivered' ;
+   CREATE NONCLUSTERED INDEX Idx_Orders_OrderStatus ON Sales.Orders(OrderStatus) ;
    ```
 
 2. **Update Statistics and indexes:**
