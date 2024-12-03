@@ -257,10 +257,10 @@ SET address = NULL;
 ```
 ---
 - **Delete**  
-DELETE is a row-by-row operation and supports a WHERE clause to specify which rows to delete.  
-DELETE can be rolled back within a transaction, while TRUNCATE cannot becuse it doesn't affect the structure of the table   
-can't delete column using delete   
-DELETE can fire triggers, while TRUNCATE usually doesn't.  
+- DELETE is a row-by-row operation and supports a WHERE clause to specify which rows to delete.  
+- DELETE can be rolled back within a transaction, while TRUNCATE cannot becuse it doesn't affect the structure of the table.   
+- can't delete column using delete.   
+- DELETE can fire triggers, while TRUNCATE usually doesn't.  
 ```sql
 DELETE FROM AUTHOR
 WHERE AUTHOR_ID IN ('A2', 'A3');  'or'
