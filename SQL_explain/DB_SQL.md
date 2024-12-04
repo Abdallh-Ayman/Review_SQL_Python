@@ -729,6 +729,11 @@ FROM products;
 | **Correlated subquery** (CROSS join APPLY) | Evaluated once for each row of the outer query. | SELECT  e.first_name, m.first_name , m.salary AS manager_salary FROM employees e JOIN employees m ON e.manager_id = m.employee_id WHERE e.salary > m.salary; |
 
 ### Semi Join (IN AND EXISTS) VS Anti Join (NOT IN AND NOT EXISTS) 
+- **If I want to retrieve results based on a single table without returning both tables from a join, I should use a semi-join.**
+    - **using join**: A regular join can result in **duplicates** because it matches every row from the left table with every matching row from the right table. Even if you use `DISTINCT`, if the **original table contains duplicates**, it will still return **incorrect results**.     
+        <img src="using_join.png" width='800px' hight='800px' > 
+    - **using Semi-join**: A semi-join finds results based **only on the left table**. It returns only the rows from the left table that have a match in the right table, **without including columns from the right table**. This avoids duplicates and returns only the relevant rows from the left table.   
+        <img src="using_subquery.png" width='800px' hight='800px' >
 
 - **Semi Join**: Returns rows from the left table where a match exists in the right table.
 - **Anti Join**: Returns rows from the left table where no match exists in the right table.
@@ -736,7 +741,6 @@ FROM products;
 A **semi join** returns rows from the left table where there is a **match in the right table**, but it only returns rows from the left table. It doesn't return duplicate rows if the right table has multiple matches, and it doesn't return columns from the right table.
 
 - **Example**: Find employees who have made a sale, but only return employee details (not the sales details).
-  
   ```sql
   SELECT e.employee_id, e.first_name
   FROM employees e
@@ -745,6 +749,7 @@ A **semi join** returns rows from the left table where there is a **match in the
       FROM sales s 
       WHERE s.employee_id = e.employee_id
   );
+
   ```
   - Here, the `EXISTS` clause ensures that we only get employees who have matching rows in the `sales` table, but it doesn't return data from `sales`.
 
@@ -917,7 +922,7 @@ where EmpSalaryRank = 1
     - window function ALL **`ROWS BETWEEN`** usage 
 
     <img src="window_function.png" width='650px' hight='650px' > 
-
+    
 - **RANK**: This function assigns a unique rank to each row within the partition, **with gaps** in the ranking for tied rows. If two or more rows tie for a rank, they receive the same rank number, and the next rank number is **incremented by the number of tied rows**. For example, if two rows are tied for rank 1, they both receive rank 1, but the next row receives rank 3, not rank 2.
 - **DENSE_RANK**: This function also assigns a unique rank to each row within the partition, but **without gaps**. It increments the rank number by 1, regardless of the number of tied rows. For example, if two rows are tied for rank 1, they both receive rank 1, and the next row receives rank 2, even if there are multiple rows with the same score.
 - **NTILE()**: This function divides an ordered dataset into a specified number of roughly equal groups, called ‘tiles’. For example, NTILE(4) would split the data into four groups. The function then assigns a group number to each row1.
