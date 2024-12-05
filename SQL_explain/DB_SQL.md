@@ -1991,11 +1991,96 @@ In summary, table statistics are a crucial part of the database's optimization p
    -  In Query 1, the filter e.salary = 1000 is part of the join condition, potentially reducing the number of rows considered in the join operation itself. In Query 2, the filter is applied after the join, which means the join is performed on all rows that meet the join condition, and then the result is filtered by e.salary = 1000.
     - If there is an index on e.salary, Query 2 might better leverage this index after performing the join.  Query 1 might not fully utilize the index on e.salary during the join process because the join condition is more complex.
     - SQL Server’s optimizer might still find it more efficient to evaluate the join first and then apply the filter in Query 2. Without indexes, the filtering step might not have a significant performance difference, but Query 2 maintains a clearer logical separation of join and filtering operations.
+    **advice** : Filter Before Joining (Big Tables)
    ```sql
-   --query 1 and
-   select * from Employee e  join Department d on d.dept_id=e.dept_id and e.salary=1000
-    --query 2 where
+   --query 1(for small and mediam size table ) -- Filter After Join (WHERE) this more logic and readable but has same speed as query 2
+
     select * from Employee e  join Department d on d.dept_id=e.dept_id where e.salary=1000
+        --
+    SELECT c.FirstName, o.OrderID
+    FROM Sales.Customers c
+    INNER JOIN Sales.Orders o ON c.CustomerID = o.CustomerID
+    WHERE o.OrderStatus = 'Delivered'
+
+    --query 2 Filter During Join (ON)
+    select * from Employee e  join Department d on d.dept_id=e.dept_id and e.salary=1000
+      ---
+    SELECT c.FirstName, o.OrderID
+    FROM Sales.Customers c
+    INNER JOIN Sales.Orders o
+    ON c.CustomerID = o.CustomerID
+    AND o.OrderStatus = 'Delivered'
+
+    --query 3(for large tables ) Filter Before Join (SUBQUERY or CTE (more optimze) ) 
+    -- Try to isolate the preparation step in a CTE or subquery 
+    SELECT c.FirstName, o.OrderID
+    FROM Sales.Customers c
+    INNER JOIN (SELECT OrderID, CustomerID FROM Sales.Orders WHERE OrderStatus = 'Delivered') o -- you can make this in CTE instead 
+    ON c.CustomerID = o.CustomerID
+    ```
+    - **Aggregate Before Joining (Big Tables)**
+    ```sql
+    -- Grouping and Joining (best practice for small and medium tables)
+    SELECT c.CustomerID, c.FirstName, COUNT(o.OrderID) AS OrderCount
+    FROM Sales.Customers c
+    INNER JOIN Sales.Orders o
+    ON c.CustomerID = o.CustomerID
+    GROUP BY c.CustomerID, c.FirstName
+
+    --Pre-aggregated Subquery (best practice for big tables)
+    SELECT c.CustomerID, c.FirstName, o.OrderCount
+    FROM Sales.Customers c
+    INNER JOIN (
+        SELECT CustomerID, COUNT(OrderID) AS OrderCount
+        FROM Sales.Orders
+        GROUP BY CustomerID
+    ) o
+    ON c.CustomerID = o.CustomerID
+
+    --bad practice corelated 
+    SELECT
+    c.CustomerID,
+    c.FirstName,
+    (SELECT COUNT(o.OrderID)
+     FROM Sales.Orders o
+     WHERE o.CustomerID = c.CustomerID) AS OrderCount
+    FROM Sales.Customers c
+    ```
+    - **Use Union Instead of OR in Joins**
+    ```sql
+    --Bad Practice as or can make loop and it avoid index
+    SELECT o.OrderID, c.FirstName
+    FROM Sales.Customers c
+    INNER JOIN Sales.Orders o
+    ON c.CustomerID = o.CustomerID
+    OR c.CustomerID = o.SalesPersonID
+
+    --Best Practice
+    SELECT o.OrderID, c.FirstName
+    FROM Sales.Customers c
+    INNER JOIN Sales.Orders o
+    ON c.CustomerID = o.CustomerID
+    UNION
+    SELECT o.OrderID, c.FirstName
+    FROM Sales.Customers c
+    INNER JOIN Sales.Orders o
+    ON c.CustomerID = o.SalesPersonID
+    ```
+    - **Check for Nested Loops and Use SQL Hints to use hash join instead**
+    ```sql 
+    -- this query use nested loop join type
+    SELECT o.OrderID, c.FirstName
+    FROM Sales.Customers c
+    INNER JOIN Sales.Orders o
+    ON c.CustomerID = o.CustomerID
+
+    -- Good Practice for Having Big Table & Small Table
+    -- =====================================================================================
+    SELECT o.OrderID, c.FirstName
+    FROM Sales.Customers c
+    INNER JOIN Sales.Orders o
+    ON c.CustomerID = o.CustomerID
+    OPTION (HASH JOIN)
     ```
 
 
