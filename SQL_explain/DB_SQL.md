@@ -1953,15 +1953,25 @@ In summary, table statistics are a crucial part of the database's optimization p
  **Optimizing** a query in SQL Server involves various techniques and strategies to improve Qyery performance.The query optimizer's goal is to minimize the cost of executing the query while considering various factors, and it achieves this by exploring and selecting the most efficient logical and physical plans.  
 
 1. **Use Indexes:**
-   - Ensure that appropriate indexes are created on columns that is regularly used in **WHERE clauses and JOIN conditions**.(we can use sql server profilier and sql server tuning advisor to give recommendations on column  that is regularly used in select where and join)
-   - Consider covering indexes to include all columns needed for a query in the index itself.
-   - if the **range** of search is very large (ex: between 1 and 2000) the optimizer could choose the whole table scan instead of the index scan as the index scan will scan alot of pages and could **scan the specific page multiple times** this could take more time than the whole table scan.and there is could be database that can store the page in there cashe so it doesn't need to make scan again.
-   ```sql
-   CREATE INDEX idx_example ON your_table(column1, column2);
+   - Cluster and non cluster
+        - Ensure that appropriate indexes are created on columns that is regularly used in **WHERE clauses and JOIN conditions**.(we can use sql server profilier and sql server tuning advisor to give recommendations on column  that is regularly used in select where and join)
+        - Consider covering indexes to include all columns needed for a query in the index itself.
+        - if the **range** of search is very large (ex: between 1 and 2000) the optimizer could choose the whole table scan instead of the index scan as the index scan will scan alot of pages and could **scan the specific page multiple times** this could take more time than the whole table scan.and there is could be database that can store the page in there cashe so it doesn't need to make scan again.
+            ```sql
+            CREATE INDEX idx_example ON your_table(column1, column2);
 
-   SELECT * FROM Sales.Orders WHERE OrderStatus = 'Delivered' ;
-   CREATE NONCLUSTERED INDEX Idx_Orders_OrderStatus ON Sales.Orders(OrderStatus) ;
-   ```
+            SELECT * FROM Sales .Orders WHERE OrderStatus = 'Delivered' ;
+            CREATE NONCLUSTERED INDEX Idx_Orders_OrderStatus ON Sales.Orders(OrderStatus) ;
+            ```
+
+    - Use Columnstore Index for Aggregations on Large Table
+           
+        ```sql
+            SELECT CustomerID, COUNT (OrderlD) AS OrderCount
+            FROM Sales.Orders
+            GROUP BY CustomerID
+            CREATE CLUSTERED COLUMNSTORE INDEX ldx Orders Columnstore ON Sales .Orders
+        ```
 
 2. **Update Statistics and indexes:**
    - Regularly update statistics to help the query optimizer make better decisions.
@@ -2172,23 +2182,61 @@ In summary, table statistics are a crucial part of the database's optimization p
     WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF)
     ON DatePartitionScheme(Date);
     ```  
-This process results in a partitioned table where data is organized based on the specified column (in this case, Date), and each partition corresponds to a specific range (e.g., month). Partitioning is beneficial for improving query performance, especially with large datasets.
+    This process results in a partitioned table where data is organized based on the specified column (in this case, Date), and each partition corresponds to a specific range (e.g., month). Partitioning is beneficial for improving query performance, especially with large datasets.
 
 15. **To know the time of the query**  
-you can use this and run you query it will show the time in the messange tab
-```sql 
-SET STATISTICS TIME ON; 
-```
-OR
-```sql
-DECLARE @StartTime DATETIME = GETDATE();
+    you can use this and run you query it will show the time in the messange tab
+    ```sql 
+    SET STATISTICS TIME ON; 
+    ```
+    OR
+    ```sql
+    DECLARE @StartTime DATETIME = GETDATE();
 
--- Your query here
-SELECT * FROM YourTable;
+    -- Your query here
+    SELECT * FROM YourTable;
 
-DECLARE @EndTime DATETIME = GETDATE();
-PRINT 'Total execution time (in milliseconds): ' + CAST(DATEDIFF(MILLISECOND, @StartTime, @EndTime) AS VARCHAR);
-```
+    DECLARE @EndTime DATETIME = GETDATE();
+    PRINT 'Total execution time (in milliseconds): ' + CAST(DATEDIFF(MILLISECOND, @StartTime, @EndTime) AS VARCHAR);
+    ```
+16. **Use UNION ALL instead of using UNION**  
+    - **if duplicates are acceptable or there is no duplicate in your data** : you should use union all 
+        ```sql
+        -- Bad Practice
+        SELECT Customer1D FROM sales.orders
+        UNION
+        SELECT Customer1D FROM Sales.OrdersArchive
+
+        -- Best Practice
+        SELECT Customer1D FROM sales.orders
+        UNION ALL
+        SELECT Customer1D FROM Sales.OrdersArchive
+        ```
+    - **if duplicates are not acceptable** : Use UNION ALL + Distinct instead of using UNION
+        ```sql
+       -- Bad Practice
+        SELECT CustomerID FROM Sales. Orders
+        UNION
+        SELECT CustomerID FROM Sales.OrdersArchive
+
+        -- Best Practice (you should also see the execuation plan to test it if it is better from the union then use it )
+
+        SELECT DISTINCT Customer1D
+        FROM(
+            SELECT Customer1D FROM Sales .Orders
+            UNION ALL
+            SELECT CustomerID FROM Sales.OrdersArchivel
+        )  AS CombinedData
+        ```
+17. **Pre-Aggregate Data and store it in new Table for Reporting**
+    ```sql
+    SELECT MONTH(OrderDate) OrderYear,
+    INTO Sales. SalesSummary
+    FROM Sales .Orders
+    GROUP BY MONTH(OrderDate)
+    SUM(Sa1es) AS TotalSa1es
+    SELECT OrderYear, TotalSa1es FROM Sales. SalesSummary
+    ```
 
 ## query lifecycle how optimizer work 
 
