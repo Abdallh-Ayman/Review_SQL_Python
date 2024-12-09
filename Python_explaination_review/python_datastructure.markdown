@@ -103,7 +103,7 @@ heterogeneous_list = [1, 'two', 3.0, True]
     
     # Unpacking
     listt= [1,2,3,4,5]  # Unpacking list must be the same number of the list
-    frist,second,*remain=listt
+    frist,second,*remain=listt   
     print(frist,second,remain)
     # Output >> 1 2 [3, 4, 5]
     #we can use unpacking operator to make list or combine two list in the new list
@@ -183,7 +183,9 @@ min_value = min(my_tuple)                  # Finding Minimum
 nested_tuple = ((1, 2), (3, 4), (5, 6))
 flattened_tuple = tuple(item for sublist in nested_tuple for item in sublist)  # Flattening Nested Tuples
 a, *rest = my_tuple                        # Tuple Unpacking with Asterisk
+
 list_of_tuples = [(1, 2), (3, 4), (5, 6)]
+# unpacking operator ( * ) remove the outer pracet (list[] or tuple() ) so it divide each element so the input to the zip will be each element as individual from list_of_tuples
 tuple_of_lists = tuple(zip(*list_of_tuples))  # Converting List of Tuples to Tuple of Lists output >>> ((1, 3, 5), (2, 4, 6))
 
 for index, value in enumerate(my_tuple):  # Enumerating Tuples
