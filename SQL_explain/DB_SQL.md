@@ -1965,13 +1965,20 @@ In summary, table statistics are a crucial part of the database's optimization p
             ```
 
     - Use Columnstore Index for Aggregations on Large Table
-           
+        - A Clustered Columnstore Index in SQL Server is ideal for improving query performance on large tables, especially for aggregation-heavy queries like `COUNT`, `SUM`, and `AVG`. 
+
+        - How it works: **Stores data in columns instead of rows**, allowing efficient compression, faster scans, and better performance for analytical workloads.
+        - Use case: Suitable for large datasets and read-heavy scenarios (OLAP workloads) where aggregations or full table scans are common.
+        - Performance benefits: Faster query execution, reduced storage requirements, and better parallelism.
+        - Caution: Avoid for write-heavy workloads, as updates and inserts may incur overhead.
+
         ```sql
             SELECT CustomerID, COUNT (OrderlD) AS OrderCount
             FROM Sales.Orders
             GROUP BY CustomerID
             CREATE CLUSTERED COLUMNSTORE INDEX ldx Orders Columnstore ON Sales .Orders
         ```
+        - In your example, creating a Clustered Columnstore Index on Sales.Orders optimizes the `COUNT(OrderID)` aggregation query grouped by `CustomerID`.
 
     - Avoid Over Indexing
     - Drop unused Indexes
@@ -2154,8 +2161,8 @@ In summary, table statistics are a crucial part of the database's optimization p
     - For large tables, consider partitioning based on certain criteria, which can improve query performance.
     Certainly! Here's a summary of creating a partitioned table using a simplified example:
     1. Choose a Partitioning Key:
-        - Select a column that will be the basis for partitioning. In this example, it's the Date column.
-
+        - Select a column that will be the basis for partitioning. In this example, it's the Date column. 
+        
     2. Create the Partition Function:
         - Define a partition function to determine how data will be divided into partitions. For instance, create a monthly partition function.  
 
