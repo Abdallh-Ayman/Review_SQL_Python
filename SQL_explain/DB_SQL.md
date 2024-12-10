@@ -774,7 +774,7 @@ An **anti join** returns rows from the left table **where there is no match in t
 | **Execution**              | Evaluates all rows returned by the subquery.      | Stops as soon as a match (or non-match) is found.      |
 | **Performance**            | Better for small result sets.<br> Can become inefficient with large data sets.                      | Better for large result sets. <br> Generally faster for large datasets due to early exit.                        |
 | **NULL Handling**          | `NOT IN` struggles with `NULL` values.            | `NOT EXISTS` handles `NULL` values efficiently.      |
-| **When to Use:**      | Use **`IN`** when working with smaller, known sets of values.<br> Avoid **`NOT IN`** when the subquery can return `NULL` values     | Use **`EXISTS`** when dealing with larger datasets, or when you need to check for the existence of related rows.<br> prefer **`NOT EXISTS`** for better performance and `NULL` handling |
+| **When to Use:**      | Use `IN` when working with smaller, known sets of values.<br> Avoid `NOT IN` when the subquery can return `NULL` values and in general **`IN is Bad Practice`**   | Use `EXISTS` when dealing with larger datasets, or when you need to check for the existence of related rows.<br> prefer `NOT EXISTS` for better performance and `NULL` handling so in general **`Exists is good practice if you need to select from left table only `** |
 
 When using `IN`, SQL must evaluate **all rows** returned by the subquery, and the outer query compares each row's value against this full set.  
 ```sql
@@ -1973,6 +1973,11 @@ In summary, table statistics are a crucial part of the database's optimization p
             CREATE CLUSTERED COLUMNSTORE INDEX ldx Orders Columnstore ON Sales .Orders
         ```
 
+    - Avoid Over Indexing
+    - Drop unused Indexes
+    - Update Statistics (Weekly)
+    - Reorganize & Rebuild Indexes (Weekly)
+
 2. **Update Statistics and indexes:**
    - Regularly update statistics to help the query optimizer make better decisions.
    -  you should **rebuild** or update the Statistics tables or index after inserting a bulk of large data to increase performance.
@@ -2145,6 +2150,7 @@ In summary, table statistics are a crucial part of the database's optimization p
 
 
 14. **Consider Partitioning:**
+    - <img src="partiotion.png" width='650px' hight='650px' >  
     - For large tables, consider partitioning based on certain criteria, which can improve query performance.
     Certainly! Here's a summary of creating a partitioned table using a simplified example:
     1. Choose a Partitioning Key:
@@ -2237,6 +2243,70 @@ In summary, table statistics are a crucial part of the database's optimization p
     SUM(Sa1es) AS TotalSa1es
     SELECT OrderYear, TotalSa1es FROM Sales. SalesSummary
     ```
+18. **Avoid Redundant Logic in Your Query**
+
+```sql
+    -- Bad Practice
+    SELECT EmployeeID, FirstName, 'Above Average' Status
+    FROM Sales.Employees
+    WHERE Salary > (SELECT AVG(Sa1ary) FROM Sales.Employees )
+    UNION ALL
+    SELECT EmployeeID, FirstName, 'Below Average'   Status
+    FROM Sales.Employees
+    WHERE Salary < (SELECT AVG(Sa1ary) FROM Sales.Employees)
+
+    -- Good Practice if you see redundant logic as above thik of CTE or Window function to remove this redundant
+    SELECT
+    EmployeeID,
+    FirstName,
+    CASE
+    WHEN Salary > AVG(SaIary) OVER () THEN 'Above Average'
+    WHEN Salary < AVG(Sa1ary) OVER () THEN 'Below Average'
+    ELSE  'Average' End as Status
+    FROM Sales.Employees
+
+```
+
+19. **DDL Optimization**
+- Avoid Data Types VARCHAR & TEXT
+- Avoid (MAX) unnecessarily large lengths in data types
+- Use the NOT NULL constraint where applicable
+- Ensure all your tables have a Clustered Primary Key
+- Create a non-clustered index for foreign keys that are used frequently
+```sql
+    -- bad practice 
+    CREATE TABLE CustomersInfo (
+    CustomerID INT,
+    FirstName VARCHAR(MAX),
+    LastName TEXT,
+    Country VARCHAR(255),
+    TotalPurchases FLOAT,
+    Score VARCHAR(255),
+    BirthDate VARCHAR(255),
+    EmployeeID INT,
+    CONSTRAINT FK_CustomersInfo_EmployeeID FOREIGN KEY (EmployeeID)
+    REFERENCES Sales.Employees(EmployeeID)
+);
+
+-- best Practice 
+CREATE TABLE CustomersInfo (
+    CustomerID INT PRIMARY KEY CLUSTERED,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Country VARCHAR(50) NOT NULL,s
+    TotalPurchases FLOAT,
+    Score INT,
+    BirthDate DATE,
+    EmployeeID INT,
+    CONSTRAINT FK_CustomersInfo_EmployeeID FOREIGN KEY (EmployeeID)
+    REFERENCES Sales.Employees(EmployeeID)
+);
+
+CREATE NONCLUSTERED INDEX IX_CustomersInfo_EmployeeID
+ON CustomersInfo(EmployeeID);
+
+
+```
 
 ## query lifecycle how optimizer work 
 
