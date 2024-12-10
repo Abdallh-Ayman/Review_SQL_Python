@@ -896,6 +896,9 @@ Machine 0's average time is ((1.520 - 0.712) + (4.120 - 3.140)) / 2 = 0.894
 Machine 1's average time is ((1.550 - 0.550) + (1.420 - 0.430)) / 2 = 0.995
 Machine 2's average time is ((4.512 - 4.100) + (5.000 - 2.500)) / 2 = 1.456
 
+**self join**: we consider the first row of the table is the left table and second row of the table is the right table to write the condition Easly with the above note .  
+Since each row from the original table is matched with every row where the ID is the same, you get a duplication of rows. For example, if there are 4 rows with ID=1 in the original table, and 4 rows with ID=1 in the joined table, you'll get 16 rows in the result set (4x4=16). This multiplication of rows occurs for each unique ID in the original table.  
+
 ```sql 
 /* Write your T-SQL query statement below */
 select a.machine_id,
@@ -936,7 +939,7 @@ Output:
 SELECT ma.name
 FROM Employee em
 INNER JOIN Employee ma
-ON ma.id = em.managerid
+ON em.managerid= ma.id  -- the compiler see what you want to replace in the left table (em) , it replace em.managerid so the em table will contains Employee data and will replace ma.id with the mangerid
 GROUP BY ma.name, ma.id
 HAVING COUNT(em.id)>=5
 ```
