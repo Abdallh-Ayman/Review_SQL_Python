@@ -1486,10 +1486,47 @@ PIVOT
 -- catch error before happen in the data base .  
 -- **return**:It's not mandatory to return a value like function. it can **return** integer (number) but this number have meaning or tell us the behaviour of the SP for the database developer or application programmer.  
 ```sql
+--==================
+--when to use execute 
+--==================
+execute('select' + @col+ 'from' + @tab)   -- to make dynamic query we use execute
+  
+-- i use dynamic query if the table name Or column name is dynamic 
+-- i can use variables in SELECT (as variable not column name) and in WHERE statement not in From 
+
+-- use it in SELECT 
+DECLARE @Country NVARCHAR(50) = 'USA';
+DECLARE @TotalCustomers INT;
+
+SELECT @TotalCustomers = COUNT(*) 
+FROM Sales.Customers 
+WHERE Country = @Country;
+
+SELECT @TotalCustomers AS TotalCustomers;
+
+-- Use it in Where 
+DECLARE @Country NVARCHAR(50) = 'USA';
+
+SELECT * 
+FROM Sales.Customers
+WHERE Country = @Country;
+
+-- syntax error  
+DECLARE @TableName NVARCHAR(50) = 'Sales.Customers';
+SELECT * 
+FROM @TableName; -- This will cause a syntax error.
+
+
+DECLARE @ColumnName NVARCHAR(50) = 'Country';
+SELECT @ColumnName 
+FROM Sales.Customers; -- This will not work.
+
+--==========================================================================================================
+
 create proc getalldata @col varchar(20) ,@tab varchar(20)
 As 
-execute('select' + @col+ 'from' + @tab)   -- to make dynamic query we use execute
 
+execute('select' + @col+ 'from' + @tab)
 --mysql
 DELIMITER //       --DELIMITER //: This sets the delimiter to // so that we can use ; within the procedure definition without causing issues.
 CREATE PROCEDURE GetEmployeeByDepartment(IN departmentName VARCHAR(50))
@@ -1502,6 +1539,20 @@ DELIMITER ;
 
 CALL GetEmployeeByDepartment('Sales');
 ```
+**Variables in sql server** 
+ - Declaration of Variables and assign value to it using **`SET`**
+ ```sql
+    DECLARE @FirstName NVARCHAR(50), @LastName NVARCHAR(50);
+    SET @FirstName = 'John';
+    SET @LastName = 'Doe';
+ ```
+ - Declaration of Variables and assign value to it using **`SELECT`**
+ - The **`SELECT`** statement can also be used to assign values to variables, especially **when retrieving data from a table or expression**.
+ ```SQL
+    DECLARE @FirstName NVARCHAR(50), @LastName NVARCHAR(50);
+    SELECT @FirstName = FirstName, @LastName = LastName FROM Employees WHERE EmployeeID = 1;
+
+ ```
 **types of SP parameter** 
 Stored procedures in a database can have different types of parameters, and these parameters allow you to pass values into the stored procedure when it is called. Let's explore the common types of stored procedure parameters in simple terms:
 
@@ -1601,6 +1652,75 @@ BEGIN
     INSERT INTO Employees (EmployeeID, EmployeeName)
     SELECT EmployeeID, EmployeeName FROM @Employees;
 END;    
+```
+### 6. **tips to organize stored procedure**
+
+```sql
+
+ALTER PROCEDURE GetCustomerSummary
+    @Country NVARCHAR(50) = 'USA'
+AS
+BEGIN
+    BEGIN TRY
+        -- Declare variables to hold summary values
+        DECLARE @TotalCustomers INT, @AvgScore FLOAT;
+
+        --===============================
+        -- Step 1: Prepare & Cleanup Data
+        --===============================
+        IF EXISTS (
+            SELECT 1
+            FROM Sales.Customers
+            WHERE Score IS NULL AND Country = @Country
+        )
+        BEGIN
+            PRINT('Updating NULL Scores to 0');
+
+            -- We make this update only if condition comes true as if i make this udate without if it will read the table multiple times
+            UPDATE Sales.Customers         
+            SET Score = 0
+            WHERE Score IS NULL AND Country = @Country;
+        END
+        ELSE
+        BEGIN
+            PRINT('No NULL Scores found');
+        END;
+
+        --=================================
+        -- Step 2: Generate Summary Reports
+        --=================================
+
+        -- Calculate Total Customers and Average Score for the specified country
+        SELECT
+            @TotalCustomers = COUNT(*),
+            @AvgScore = AVG(Score)
+        FROM Sales.Customers
+        WHERE Country = @Country;
+
+        PRINT 'Total Customers from ' + @Country + ': ' + CAST(@TotalCustomers AS NVARCHAR);
+        PRINT 'Average Score from ' + @Country + ': ' + CAST(@AvgScore AS NVARCHAR);
+
+        -- Calculate Total Number of Orders and Total Sales for the specified country
+        SELECT
+            COUNT(o.OrderID) AS TotalOrders,
+            SUM(o.Sales) AS TotalSales
+        FROM Sales.Orders o
+        JOIN Sales.Customers c ON c.CustomerID = o.CustomerID
+        WHERE c.Country = @Country;
+
+    END TRY
+    BEGIN CATCH
+        --================
+        -- Error Handling
+        --================
+        PRINT('An error occurred.');
+        PRINT('Error Message: ' + ERROR_MESSAGE());
+        PRINT('Error Number: ' + CAST(ERROR_NUMBER() AS NVARCHAR));
+        PRINT('Error Line: ' + CAST(ERROR_LINE() AS NVARCHAR));
+        PRINT('Error Procedure: ' + ERROR_PROCEDURE());
+    END CATCH
+END;
+
 ```
 
 - **Views**  
