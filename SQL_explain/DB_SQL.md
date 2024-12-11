@@ -1654,6 +1654,9 @@ BEGIN
 END;    
 ```
 ### 6. **tips to organize stored procedure**
+- Add a semicolon; at the end of each SQL statement
+- Handle nulls before aggregating to ensure accurate results
+- make styling to each step like below to make it easy to read
 
 ```sql
 
@@ -1665,9 +1668,9 @@ BEGIN
         -- Declare variables to hold summary values
         DECLARE @TotalCustomers INT, @AvgScore FLOAT;
 
-        --===============================
-        -- Step 1: Prepare & Cleanup Data
-        --===============================
+        --=================================================================
+        -- Step 1: Prepare & Cleanup Data from the null to get accurate avg
+        --=================================================================
         IF EXISTS (
             SELECT 1
             FROM Sales.Customers
