@@ -1385,3 +1385,76 @@ select count(*)
 from cte
 where rn=1 and event !='C' and DATEADD (month,subscription_period,event_date)>= '2020-12-31'
 ```
+
+
+-------
+<img src="case_when_idea.png" width='800px' hight='800px' > 
+
+```sql
+create table assessments
+(
+id int,
+experience int,
+sql int,
+algo int,
+bug_fixing int
+)
+delete from assessments
+insert into assessments values 
+(1,3,100,null,50),
+(2,5,null,100,100),
+(3,1,100,100,100),
+(4,5,100,50,null),
+(5,5,100,100,100)
+
+delete from assessments
+insert into assessments values 
+(1,2,null,null,null),
+(2,20,null,null,20),
+(3,7,100,null,100),
+(4,3,100,50,null),
+(5,2,40,100,100);
+
+--== solution 1 using case when 
+SELECT 
+    experience, 
+    COUNT(id) AS total_students,
+    COUNT(CASE 
+             WHEN (sql = 100 OR sql IS NULL) 
+                  AND (algo = 100 OR algo IS NULL) 
+                  AND (bug_fixing = 100 OR bug_fixing IS NULL) 
+             THEN 1 
+          END) AS Max_score_student
+FROM assessments
+GROUP BY experience;
+
+--== solution 2 using union all
+
+WITH cte AS (
+    SELECT id, experience, sql AS score, 'sql' AS subject
+    FROM assessments
+    UNION ALL
+    SELECT id, experience, algo AS score, 'algo' AS subject
+    FROM assessments
+    UNION ALL
+    SELECT id, experience, bug_fixing AS score, 'bug_fixing' AS subject
+    FROM assessments
+)
+SELECT experience, 
+       SUM(perfect_score_flag) AS max_score_students,
+       COUNT(*) AS total_students
+FROM (
+    SELECT id, 
+           experience, 
+           CASE 
+               WHEN SUM(CASE WHEN score IS NULL OR score = 100 THEN 1 ELSE 0 END) = 3 
+-- i can make this = (select COUNT(distinct subject) from cte) not 3 to make it dynamic if i add new one to union all the query will work correctly 
+               THEN 1 ELSE 0 
+           END AS perfect_score_flag
+    FROM cte
+    GROUP BY id, experience
+) a
+GROUP BY experience;
+;
+
+```
