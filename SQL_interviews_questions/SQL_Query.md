@@ -919,7 +919,7 @@ https://leetcode.com/problems/managers-with-at-least-5-direct-reports/?envType=s
 
 Input: 
 Employee table:
-| id  | name  | department | managerId |
+| id  | name  | department | managerId |  
 |-----|-------|------------|-----------|
 | 101 | John  | A          | null      |
 | 102 | Dan   | A          | 101       |
