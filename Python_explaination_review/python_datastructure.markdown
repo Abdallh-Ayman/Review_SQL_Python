@@ -432,7 +432,10 @@ If the script is located in `"/home/user/project/"`, the two lines would work as
 ## 1.using APIs
 
 ### python code example 
-
+- Use requests.get (or other specialized methods like requests.post) when performing a specific HTTP method. It keeps the code clean and readable.
+- `response = requests.get(source_url, headers=headers,timeout=20)`
+- Use requests.request when the HTTP method is dynamic or when implementing more advanced use cases.
+- `response = requests.request("GET", url, headers=headers, timeout=20)`
 ```python
 import json
 import requests
