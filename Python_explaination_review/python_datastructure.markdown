@@ -367,7 +367,7 @@ for pdf_file in pdf_files:
 ```
 ### jason
 Json : it coud be all object into on list or one object contain list of object.   
-1- To read a JSON file, you can use the json.load() function.This function reads a file-like object and returns the data. If you have a JSON string, you can parse it by using the json.loads() method. ( Json string parse to python object(dictonary or list).)
+1- To read a JSON file, you can use the json.load() function.This function reads a file-like object (which is the json [f]) and returns the data. If you have a JSON string, you can parse it to python object by using the json.loads() method >> **( it make parse Json string to python object(dictonary or list).)**
 ```python
     Import json
     with open('data.json') as f :
@@ -415,7 +415,7 @@ If the script is located in `"/home/user/project/"`, the two lines would work as
 - `file_path` will then be `"/home/user/project/config.json"`.
      
 ```python
-   # json.dump >> Does not return anything; it writes the JSON output to the provided file-like object
+   # json.dump >> Does not return anything; it writes the JSON output to the provided file-like object (which is f)
     data ={'name':'John','age':30,'city':'New York'}
     with open('users.json','w') as f:
         json.dump(data,f)
