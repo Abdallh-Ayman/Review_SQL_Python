@@ -1519,8 +1519,51 @@ ON seats.id = CTE_NewSeats.id
 
 ```
 
+### unique number
 
+```sql 
+create table phone_numbers (num varchar(20));
+insert into phone_numbers values
+('1234567780'),
+('2234578996'),
+('+1-12244567780'),
+('+32-2233567889'),
+('+2-23456987312'),
+('+91-9087654123'),
+('+23-9085761324'),
+('+11-8091013345');
+```
 
+```sql
+
+WITH cte AS (
+    SELECT 
+        num,
+        CASE 
+            WHEN CHARINDEX('-', num) = 0 THEN num
+            ELSE SUBSTRING(num, CHARINDEX('-', num) + 1, LEN(num))
+        END AS new_num
+    FROM phone_numbers
+)
+, cte2 as (
+SELECT 
+    new_num, 
+    SUBSTRING(new_num, number, 1) AS split_char
+FROM cte
+CROSS APPLY (
+    SELECT TOP (LEN(new_num)) ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS number
+    FROM master.dbo.spt_values
+) AS num_sequence)
+, cte3 as (
+SELECT new_num, COUNT(split_char) as digits_douplicated , count(DISTINCT split_char) as  digits_without_douplicated
+from cte2
+GROUP by new_num)
+
+SELECT * 
+FROM cte3
+WHERE  digits_douplicated = digits_without_douplicated
+
+```
 
 
 
