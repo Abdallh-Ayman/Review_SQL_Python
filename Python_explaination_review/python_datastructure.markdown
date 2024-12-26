@@ -329,7 +329,6 @@ for k, v in data:
 # Print the resulting multi_dict
 print("Multi Dictionary:", multi_dict)
 
-
 merged_dict = dict(ChainMap(dict1, dict2))  # Merges dictionaries while preserving original dictionaries
 # Dictionary Comprehensions
 squared_dict = {x: x**2 for x in range(1, 6)}  # Creates a dictionary of squares from 1 to 5
@@ -337,10 +336,66 @@ inverted_dict = {v: k for k, v in my_dict.items()}  # Creates a new dictionary w
 merged_dict = {k: v for d in list_of_dicts for k, v in d.items()}  # Creates a dictionary by merging keys and values from a list of dictionaries
 filtered_dict = {k: v for k, v in my_dict.items() if v != 'value_to_remove'}  # Removes key-value pairs with a specific value from the dictionary
 ```
+
+## Defualt dictionary 
+
+### **Key Differences**
+1. **Default Value Handling**:
+   - **Normal Dictionary**: Throws a `KeyError` if you try to access a key that does not exist.
+   - **Default Dictionary**: Automatically initializes missing keys with a default value (provided by a factory function).
+
+2. **Initialization**:
+   - **Normal Dictionary**: Created using `{}` or the `dict()` constructor.
+   - **Default Dictionary**: Created using `collections.defaultdict()` and requires a default value factory function (e.g., `int`, `list`).
+
+---
+
+### **When to Use Each**
+1. **Normal Dictionary**:
+   - Use when you need explicit control over keys and values and when accessing a missing key should signal an error.
+   - Example:
+     ```python
+     data = {}
+     data['a'] = 1
+     print(data['b'])  # Raises KeyError
+     ```
+
+2. **Default Dictionary**:
+   - Use when you want to avoid `KeyError` and require default values for non-existing keys, such as for counters or grouping.
+   - Example:
+     ```python
+     from collections import defaultdict
+     data = defaultdict(int)  # Default value is 0
+     data['a'] += 1
+     print(data['b'])  # Outputs 0, no KeyError
+     ```
+---
+
+1. **Normal Dictionary Example**:
+   ```python
+   data = {}
+   if 'key' not in data:
+       data['key'] = 0  # Initialize manually
+   data['key'] += 1
+   print(data)  # {'key': 1}
+   ```
+
+2. **Default Dictionary Example**:
+   ```python
+   from collections import defaultdict
+   data = defaultdict(int)  # Default value factory is int
+
+   data['key'] += 1  # so this will not give me error like above 
+
+   print(data)  # defaultdict(<class 'int'>, {'key': 1})
+   ```
+
+---
+
+
 -----
 ## map, filter ,reduce , comperhensive list and dictonry , generator 
-
-
+ 
 ----
 ## files 
 #r r+(can read and write)  w(when w it delete everything) w+() a()   a+()
