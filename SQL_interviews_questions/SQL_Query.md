@@ -1458,3 +1458,69 @@ GROUP BY experience;
 ;
 
 ```
+
+----
+### Swap the student 
+<img src="swap_value.png" width='800px' hight='800px' > 
+the question 
+
+```sql 
+
+CREATE TABLE seats (
+    id INT,
+    student VARCHAR(10)
+);
+
+INSERT INTO seats VALUES 
+(1, 'Amit'),
+(2, 'Deepa'),
+(3, 'Rohit'),
+(4, 'Anjali'),
+(5, 'Neha'),
+(6, 'Sanjay'),
+(7, 'Priya');
+
+```
+
+```sql
+-- using update 
+WITH CTE_NewSeats AS (
+    SELECT *,
+    CASE 
+        WHEN id % 2 = 0 THEN LAG(id, 1, id) OVER (ORDER BY id)
+        ELSE LEAD(id, 1, id) OVER (ORDER BY id)
+    END AS new_id
+FROM seats
+)
+UPDATE seats
+SET seats.id = CTE_NewSeats.new_id
+FROM CTE_NewSeats
+WHERE seats.id = CTE_NewSeats.id;
+
+-- using select into 
+-- When creating a table using SELECT INTO, the rows are inserted in no particular order, regardless of any ORDER BY clause in the query.
+WITH CTE_NewSeats AS (
+    SELECT *,
+    CASE 
+        WHEN id % 2 = 0 THEN LAG(id, 1, id) OVER (ORDER BY id)
+        ELSE LEAD(id, 1, id) OVER (ORDER BY id)
+    END AS new_id
+FROM seats
+
+)
+SELECT 
+   CTE_NewSeats.new_id, seats.student
+INTO SeatsUpdated
+FROM seats
+JOIN CTE_NewSeats
+ON seats.id = CTE_NewSeats.id
+
+--order by CTE_NewSeats.new_id
+
+```
+
+
+
+
+
+

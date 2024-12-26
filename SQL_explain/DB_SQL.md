@@ -207,6 +207,9 @@ INTO new_student_table  -- into it will creat new table
 FROM student
 WHERE 1 = 0;
 
+-- When creating a table using SELECT INTO, the rows are inserted in no particular order, regardless of any ORDER BY clause in the query.
+
+
 -- TO Update the content of the table as if i run the above query again it will give me error as it already exist
 IF OBJECT_ID('new_student_table','U') IS NOT NULL
     DROP TABLE new_student_table;
