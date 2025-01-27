@@ -250,6 +250,13 @@ UPDATE AUTHOR
 SET LASTNAME = 'KATTA',
     FIRSTNAME = 'LAKSH'
 WHERE AUTHOR_ID = 'A2';   مهمه جدا مع الUPDATA  , DELETEE    
+
+-- Update Using JOIN:
+UPDATE e
+SET e.employee_name = 'n/a'
+FROM Employees e
+JOIN Departments d ON e.department_id = d.department_id
+WHERE d.department_name = 'Sales';
 ```   
 **delete the data in a specific column of a table without removing the column's schema**
 ```SQL
@@ -1555,7 +1562,7 @@ FROM @TableName; -- This will cause a syntax error.
 
 DECLARE @ColumnName NVARCHAR(50) = 'Country';
 SELECT @ColumnName 
-FROM Sales.Customers; -- This will not work.
+FROM Sales.Customers; -- This will work.
 
 --==========================================================================================================
 
