@@ -661,6 +661,17 @@ FROM Signups AS s
 LEFT JOIN Confirmations AS c
 ON s.user_id = c.user_id
 GROUP BY s.user_id
+
+
+**AVERAGE()**
+➤ Calculates the mean across all rows (including duplicates).
+➤ Formula: SUM / COUNT
+➤ Use when you want the overall average.
+
+**SUM / DISTINCTCOUNT**
+➤ Calculates average per unique item (e.g., per customer, per product).
+➤ Use when you want the average per distinct group.
+
 ```
 
 2- Write an SQL query to find for each month and country, the number of transactions and their total amount, the number of approved transactions and their total amount.
