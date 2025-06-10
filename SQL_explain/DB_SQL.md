@@ -466,7 +466,8 @@ order by cte.total_challenge desc,hacker_id
 **Full Outer Join**: Returns all the rows from both tables, including those where there is no match in either table.  
 **Cross Join**: Returns all possible combinations of rows from both tables.  
 **self join**:we consider the first row of the table is the left table and second row of the table is the right table to write the condition Easly with the above note .  
-Since each row from the original table is matched with every row where the ID is the same, you get a duplication of rows. For example, if there are 4 rows with ID=1 in the original table, and 4 rows with ID=1 in the joined table, you'll get 16 rows in the result set (4x4=16). This multiplication of rows occurs for each unique ID in the original table.  
+Since each row from the original table is matched with every row where the ID is the same, you get a duplication of rows. For example, if there are 4 rows with ID=1 in the original table, and 4 rows with ID=1 in the joined table, you'll get 16 rows in the result set (4x4=16). This multiplication of rows occurs for each unique ID in the original table.
+  
 | **Join Type**       | **Data Exists in Left Table Only**         | **Data Exists in Right Table Only**        | **Duplicate Rows**                                                                 |
 |---------------------|--------------------------------------------|--------------------------------------------|------------------------------------------------------------------------------------|
 | **INNER JOIN**      | Excluded                                   | Excluded                                   | Returns all matching combinations (Cartesian between duplicates)                  |
