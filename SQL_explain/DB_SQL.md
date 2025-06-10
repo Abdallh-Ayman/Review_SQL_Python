@@ -467,14 +467,15 @@ order by cte.total_challenge desc,hacker_id
 **Cross Join**: Returns all possible combinations of rows from both tables.  
 **self join**:we consider the first row of the table is the left table and second row of the table is the right table to write the condition Easly with the above note .  
 Since each row from the original table is matched with every row where the ID is the same, you get a duplication of rows. For example, if there are 4 rows with ID=1 in the original table, and 4 rows with ID=1 in the joined table, you'll get 16 rows in the result set (4x4=16). This multiplication of rows occurs for each unique ID in the original table.  
-| **Join Type**       | **data exist at Left table Only**               | **data exist at Right table Only**             | **Duplicate Rows**                                                   |
-| ------------------- | ------------------------------- | ------------------------------ | -------------------------------------------------------------------- |
-| **INNER JOIN**      | Excluded                        | Excluded                       | Returns all matching combinations (Cartesian between duplicates)     |
-| **LEFT JOIN**       | Included (with NULLs for right) | Excluded                       | Returns all matching combinations (Cartesian between duplicates) but it Includes unmatched left rows|
-| **RIGHT JOIN**      | Excluded                        | Included (with NULLs for left) | Returns all matching combinations from left and right                |
-| **FULL OUTER JOIN** | Included (with NULLs for right) | Included (with NULLs for left) | Returns all matching combinations and unmatched rows from both sides |
-| **CROSS JOIN**      | Not applicable (no condition)   | Not applicable                 | Cartesian product of all rows in both tables                         |
-| **SELF JOIN**       | Depends on condition            | Depends on condition           | Duplicates handled like normal joins—matches within the same table   |
+| **Join Type**       | **Data Exists in Left Table Only**         | **Data Exists in Right Table Only**        | **Duplicate Rows**                                                                 |
+|---------------------|--------------------------------------------|--------------------------------------------|------------------------------------------------------------------------------------|
+| **INNER JOIN**      | Excluded                                   | Excluded                                   | Returns all matching combinations (Cartesian between duplicates)                  |
+| **LEFT JOIN**       | Included (with NULLs for right)            | Excluded                                   | Returns all matching combinations (Cartesian between duplicates); includes unmatched left rows |
+| **RIGHT JOIN**      | Excluded                                   | Included (with NULLs for left)             | Returns all matching combinations from left and right                             |
+| **FULL OUTER JOIN** | Included (with NULLs for right)            | Included (with NULLs for left)             | Returns all matching combinations and unmatched rows from both sides              |
+| **CROSS JOIN**      | Not applicable (no join condition applied) | Not applicable                             | Returns the full Cartesian product of all rows in both tables                     |
+| **SELF JOIN**       | Depends on join condition                  | Depends on join condition                  | Duplicates handled like normal joins—matches occur within the same table          |
+
 
 
 ````sql
