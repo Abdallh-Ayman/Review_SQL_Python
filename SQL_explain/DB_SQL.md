@@ -479,6 +479,108 @@ Since each row from the original table is matched with every row where the ID is
 
 
 
+
+### Example Tables to show diff between left and inner with condion in where and on 
+
+```sql
+-- Customers table
+customer_id | customer_name
+------------+--------------
+1           | Alice
+2           | Bob
+3           | Carol
+
+-- Orders table
+order_id | customer_id | amount
+---------+-------------+-------
+101      | 1           | 50
+102      | 1           | 100
+103      | 2           | 200
+```
+
+---
+
+## Case 1: INNER JOIN
+
+👉 Filtering in `ON` vs `WHERE` has **the same effect**.
+
+```sql
+-- Condition in ON
+SELECT c.customer_name, o.order_id, o.amount
+FROM Customers c
+INNER JOIN Orders o
+    ON c.customer_id = o.customer_id
+   AND o.amount > 100;
+```
+
+```sql
+-- Condition in WHERE
+SELECT c.customer_name, o.order_id, o.amount
+FROM Customers c
+INNER JOIN Orders o
+    ON c.customer_id = o.customer_id
+WHERE o.amount > 100;
+```
+
+✅ Both queries will return:
+
+```
+customer_name | order_id | amount
+--------------+----------+-------
+Bob           | 103      | 200
+```
+
+---
+
+## Case 2: LEFT JOIN
+
+👉 Here the difference **matters a lot**.
+
+```sql
+-- Condition in ON
+SELECT c.customer_name, o.order_id, o.amount
+FROM Customers c
+LEFT JOIN Orders o
+    ON c.customer_id = o.customer_id
+   AND o.amount > 100;
+```
+
+Result:
+
+```
+customer_name | order_id | amount
+--------------+----------+-------
+Alice         | NULL     | NULL   -- order_id 101 excluded, 102 ignored due to filter in ON
+Bob           | 103      | 200
+Carol         | NULL     | NULL   -- still included
+```
+
+💡 Because the condition is inside the `ON`, Alice’s `amount=50` is filtered **at join time**, but Alice still appears due to `LEFT JOIN`.
+
+---
+
+```sql
+-- Condition in WHERE
+SELECT c.customer_name, o.order_id, o.amount
+FROM Customers c
+LEFT JOIN Orders o
+    ON c.customer_id = o.customer_id
+WHERE o.amount > 100;
+```
+
+Result:
+
+```
+customer_name | order_id | amount
+--------------+----------+-------
+Bob           | 103      | 200
+```
+
+💡 Because the condition is in the `WHERE`, it removes rows where `o.amount` is `NULL`. That effectively turns the `LEFT JOIN` into an `INNER JOIN`.
+
+
+
+
 ````sql
 Select order_id, c.customer_id, first_name    --select specific column
 FROM orders o   -- the table comes after from and come first will be left table 
