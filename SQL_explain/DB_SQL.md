@@ -471,7 +471,8 @@ Since each row from the original table is matched with every row where the ID is
 | **Join Type**       | **Data Exists in Left Table Only**         | **Data Exists in Right Table Only**        | **Duplicate Rows**                                                                 |
 |---------------------|--------------------------------------------|--------------------------------------------|------------------------------------------------------------------------------------|
 | **INNER JOIN**      | Excluded                                   | Excluded                                   | Returns all matching combinations (Cartesian between duplicates)                  |
-| **LEFT JOIN**       | Included (with NULLs for right)            | Excluded                                   | Returns all matching combinations (Cartesian between duplicates); includes unmatched left rows |
+| **LEFT JOIN**       | Included (with NULLs for right)            | Excluded                                   | Returns all matching combinations (Cartesian between 
+duplicates); includes unmatched left rows|
 | **RIGHT JOIN**      | Excluded                                   | Included (with NULLs for left)             | Returns all matching combinations from left and right                             |
 | **FULL OUTER JOIN** | Included (with NULLs for right)            | Included (with NULLs for left)             | Returns all matching combinations and unmatched rows from both sides              |
 | **CROSS JOIN**      | Not applicable (no join condition applied) | Not applicable                             | Returns the full Cartesian product of all rows in both tables                     |
@@ -550,7 +551,7 @@ Result:
 ```
 customer_name | order_id | amount
 --------------+----------+-------
-Alice         | NULL     | NULL   -- order_id 101 excluded, 102 ignored due to filter in ON
+Alice         | NULL     | NULL   -- order_id 101 excluded, 102 ignored due to filter in ON -- 👉 SQL does not create a NULL row for every failed match. -- 👉 It creates one NULL row per left table row if no matches at all are found.
 Bob           | 103      | 200
 Carol         | NULL     | NULL   -- still included
 ```
