@@ -66,7 +66,34 @@ heterogeneous_list = [1, 'two', 3.0, True]
     count = my_list.count(2)  # Returns the number of occurrences of 2 value in the list
     index = my_list.index(3)  # Returns the index of the first occurrence of 3
     is_present = 3 in my_list  # Returns True if 3 is present in the list, False otherwise
+
+    # Copy (Always make extra Copy for Experime)
+    #1-Avoid Assignment(refrence) = (Risky & Confusing)
+    #2-Use .copy() for simple, flat lists
     copied_list = my_list.copy()  # Creates a shallow copy of the list
+    #3-Use copy.deepcopy() for Nested Lists
+    original = [
+        ['a', 'b'],  # Row 0
+        ['c', 'd'],  # Row 1
+    ]
+    #Assigment refrence 
+    copy1 = original
+    print("Same Object?", original is copy1, "\n")
+    #Shallow Copy
+    copy2 = original.copy()
+    print("Same Object?", original is copy2)
+    print("Shared Lists?", original[0] is copy2[0], "\n")
+    #Deep Copy
+    copy3 = copy.deepcopy(original)
+    print("Same Object?", original is copy3)
+    print("Shared Lists?", original[0] is copy3[0], "\n")
+    # output >> 
+    Same Object? True
+    Same Object? False
+    Shared Lists? True    
+    Same Object? False
+    Shared Lists? False
+
     any_true = any([False, True, False])  # Returns True if any element in the list is True
     all_true = all([True, True, True])    # Returns True if all elements in the list are True
     unique_elements = list(set(my_list))  # Removes duplicates by converting list to set and back to list
