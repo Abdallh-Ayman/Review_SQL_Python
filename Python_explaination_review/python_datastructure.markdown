@@ -106,6 +106,15 @@ heterogeneous_list = [1, 'two', 3.0, True]
     frist,second,*remain=listt   
     print(frist,second,remain)
     # Output >> 1 2 [3, 4, 5]
+
+    # we can use underscor _ for removing or skip any elements we don't need to make variable for it
+    # we can repeate undersore _ unlike the astrik *
+    person = ['Maria', 29, 'Data Engineer', 'Spain']
+    name, *_, country = person
+    print(name)
+    print(country)
+   # output >>> Maria  Spain
+
     #we can use unpacking operator to make list or combine two list in the new list
     First=[1,2]
     Second=[3,4,5]
