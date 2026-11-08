@@ -13,6 +13,7 @@ Key characteristics of a foreign key:
 2. It helps maintain referential integrity, preventing orphaned records.
 3. It can have NULL values, allowing for optional relationships (if specified as NULLable). + and can be duplicated.  
 
+we can also define actions on fk when pk is updated or deleted 
 **ON UPDATE/ON delete >> NO ACTION the default behavior of the sql server ,The table that contain primary key is parent and the table that contain foreign key is child we can't remove  data from parent that have child.**  
 
 **When you create a relationship between two tables, you can specify the actions that should occur when records in the referenced (parent) table are affected by an UPDATE or DELETE operation. These actions are defined through the ON UPDATE and ON DELETE clauses**  
