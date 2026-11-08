@@ -1,4 +1,5 @@
 **Candidate Key** A key is a column or set of columns in a table that uniquely identifies each row in that table. It helps in organizing and retrieving data efficiently. There can be multiple keys in a table, but typically, one of them is chosen as the primary key It is often the least number of columns of the keys and less data type.  
+On of this columns can be chosen as a primary key if it meets the rules
 
 **Primary Key**  is a special type of key in a relational database. It **uniquely identifies each record (row)** in a table and ensures that there are no duplicate values in the primary key column(s). 
 Key characteristics of a primary key:
