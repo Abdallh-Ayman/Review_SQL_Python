@@ -72,6 +72,8 @@ WHERE ProductID = 1;
 
 char(2):static يعنى هيحجز 2 فى الميمورى لو حطيت واحد هياخدد اتنين بردو      
 VARCHAR(24):variable يعنى هيحجز 24 فى الميمورى لو حطيت واحد هياخدد واحد بس
+
+DDL stands Data Definition Lang , its used to create , alter or drop database objects for example
 ### DDL (meta data (information about information))
 - **CREATE**
 ```sql
